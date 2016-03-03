@@ -13,8 +13,9 @@ let ``drawRandom always returns six elements`` () =
 
 [<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
+    let isWithinRange x = x > 1 && x <= 49
     let numbers = MarkSix.drawNumbers ()
-    List.forall (fun (ChosenNumber n) -> n > 1 && n < 49) numbers
+    List.forall (MarkSixNumber.value >> isWithinRange) numbers
 
 [<Property>]
 let ``addDrawResultNumbers always add ExtraNumber at the end`` () =
