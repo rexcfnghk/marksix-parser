@@ -5,7 +5,7 @@ open System
 
 let drawNumbers () =
     let r = Random()
-    [ for _ in 1..6 -> ChosenNumber <| r.Next(49) + 1 ]
+    [ for _ in 1..6 -> r.Next(49) + 1 |> MarkSixNumber.create |> Option.get ]
 
 let addDrawResultNumbers =
     let rec addDrawResultNumbersImpl acc getNumber =
