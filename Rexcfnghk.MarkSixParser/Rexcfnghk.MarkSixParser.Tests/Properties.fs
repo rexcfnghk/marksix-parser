@@ -2,7 +2,6 @@
 
 open System
 open Models
-open Xunit
 open FsCheck.Xunit
 open Swensen.Unquote
 
