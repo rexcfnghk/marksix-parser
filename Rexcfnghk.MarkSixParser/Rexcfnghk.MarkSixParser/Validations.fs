@@ -2,8 +2,8 @@
 
 type ErrorMessage = ErrorMessage of string
 
-type ValidationResult<'a> =
-    | Success of 'a
+type ValidationResult<'T> =
+    | Success of 'T
     | Error of ErrorMessage
 
 module ValidationResult =
