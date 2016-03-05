@@ -1,7 +1,8 @@
 ﻿module MarkSix
 
-open Models
 open System
+open System.Collections.Generic
+open Models
 open Rexcfnghk.MarkSixParser
 
 let drawNumbers () =
@@ -11,16 +12,26 @@ let drawNumbers () =
         |> MarkSixNumber.tryCreate
         |> Option.get ]
 
-let addDrawResultNumbers =
-    let rec addDrawResultNumbersImpl acc getNumber =
-        let count = Set.count acc
+let addDrawResultNumbers getNumber errorHandler =
+    let createFromGetNumber = () |> (getNumber >> MarkSixNumber.create)
+
+    let rec innerErrorHandler markSixElement e = 
+        errorHandler e
+        match createFromGetNumber with
+        | Success x -> markSixElement x
+        | Error e -> innerErrorHandler markSixElement e
+
+    let rec addDrawResultNumbersImpl (acc: HashSet<DrawResultElement>) =
+        let count = acc.Count
         if count = 7
-        then acc |> Set.toList
+        then acc |> Seq.toList
         else
-            let element =  
-                getNumber ()
-                |> MarkSixNumber.tryCreate
-                |> Option.bind (if count = 6 then ExtraNumber else DrawnNumber)
-            let updated = Set.add element acc
-            addDrawResultNumbersImpl updated getNumber
-    addDrawResultNumbersImpl Set.empty
+            let typer = if count = 6 then ExtraNumber else DrawnNumber
+            let element = 
+                createFromGetNumber
+                |> ValidationResult.doubleMap typer (innerErrorHandler typer)
+                //|> Option.map (if count = 6 then ExtraNumber else DrawnNumber)
+            acc.Add element |> ignore
+            addDrawResultNumbersImpl acc
+
+    addDrawResultNumbersImpl <| HashSet()

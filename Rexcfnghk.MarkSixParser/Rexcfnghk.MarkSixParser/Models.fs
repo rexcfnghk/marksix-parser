@@ -1,5 +1,5 @@
 ﻿module Models
 
-type DrawResultElements =
-    | DrawnNumber of int
-    | ExtraNumber of int
+type DrawResultElement =
+    | DrawnNumber of MarkSixNumber.T
+    | ExtraNumber of MarkSixNumber.T

@@ -20,7 +20,7 @@ let ``drawRandom always returns numbers between 1 and 49`` () =
 [<Property>]
 let ``addDrawResultNumbers always add ExtraNumber at the end`` () =
     let r = Random()
-    let resultListRev = List.rev <| MarkSix.addDrawResultNumbers (fun () -> r.Next(49) + 1)
+    let resultListRev = List.rev <| MarkSix.addDrawResultNumbers (fun () -> r.Next(49) + 1) ignore
     match resultListRev with
     | (ExtraNumber _) :: _ -> true
     | _ -> false

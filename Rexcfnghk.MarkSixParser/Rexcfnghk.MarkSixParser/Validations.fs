@@ -14,3 +14,7 @@ module ValidationResult =
     let success = Success
 
     let error = Error
+
+    let doubleMap successHandler errorHandler = function
+        | Success x -> successHandler x
+        | Error e -> errorHandler e
