@@ -45,9 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Models.fs" />
+    <Compile Include="Validations.fs" />
     <Compile Include="MarkSixNumber.fsi" />
     <Compile Include="MarkSixNumber.fs" />
+    <Compile Include="Models.fs" />
     <Compile Include="MarkSix.fs" />
   </ItemGroup>
   <PropertyGroup>
