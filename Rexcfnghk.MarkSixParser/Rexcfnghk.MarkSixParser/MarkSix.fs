@@ -9,8 +9,8 @@ let drawNumbers () =
     let r = Random()
     [ for _ in 1..6 -> 
         r.Next(1, 50) 
-        |> MarkSixNumber.createOption
-        |> Option.get ]
+        |> MarkSixNumber.create
+        |> ValidationResult.extract ]
 
 let getDrawResultNumbers getNumber errorHandler =
     let createFromGetNumber = getNumber >> MarkSixNumber.create
