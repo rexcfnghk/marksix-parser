@@ -1,6 +1,25 @@
 ﻿module Rexcfnghk.MarkSixParser.MarkSixNumber
 
-type T = MarkSixNumber of int
+open System
+
+[<CustomComparison; CustomEquality>]
+type T = 
+    | MarkSixNumber of int
+    interface IComparable<T> with
+        member this.CompareTo other =
+            let (MarkSixNumber thisInt, MarkSixNumber otherInt) = this, other
+            thisInt.CompareTo otherInt
+    interface IComparable with
+        member this.CompareTo other =
+            (this :> IComparable<T>).CompareTo(other :?> T)
+    interface IEquatable<T> with
+        member this.Equals other =
+            this.Equals other
+    override this.Equals other =
+        (this :> IComparable).CompareTo other = 0
+    override this.GetHashCode() =
+        let (MarkSixNumber thisInt) = this
+        thisInt
 
 let create input = 
     if input >= 1 && input <= 49 then
@@ -10,6 +29,6 @@ let create input =
         "Input out of range"
         |> ValidationResult.errorFromString
 
-let tryCreate = create >> ValidationResult.extract
+let createOption = create >> ValidationResult.extractOption
 
 let value (MarkSixNumber num) = num

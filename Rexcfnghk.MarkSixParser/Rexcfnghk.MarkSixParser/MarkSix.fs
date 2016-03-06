@@ -9,7 +9,7 @@ let drawNumbers () =
     let r = Random()
     [ for _ in 1..6 -> 
         r.Next(1, 50) 
-        |> MarkSixNumber.tryCreate
+        |> MarkSixNumber.createOption
         |> Option.get ]
 
 let getDrawResultNumbers getNumber errorHandler =
@@ -37,45 +37,50 @@ let getDrawResultNumbers getNumber errorHandler =
     getDrawResultNumbersImpl <| HashSet()
 
 let checkResults errorHandler drawResults usersDraw =
+    let validateSixMarkSixNumbers input =
+        if List.length input = 6
+        then Success input
+        else 
+            "MarkSixNumber list has incorrect length"
+            |> ValidationResult.errorFromString
+
     let validateDrawResultsWithoutExtraNumber =
         let getDrawResultsWithoutExtraNumber = function
             | _ :: t -> ValidationResult.success t
             | [] -> "Draw result list is empty" |> ValidationResult.errorFromString
 
-        let validateDrawResultsWithoutExtraNumberLength input =
-            if List.length input = 6
-            then Success input
-            else 
-                "Draw result list has incorrect length"
-                |> ValidationResult.errorFromString
-
-        let validateDrawResultsWithoutExtraNumberAreAllDrawnNumbers input =
-            let allDrawnNumbers = 
-                List.forall (function DrawnNumber _ -> true | _ -> false) input
-            if allDrawnNumbers
-            then Success input
-            else 
-                "Draw result list contains more than one extra number"
-                |> ValidationResult.errorFromString
+        let validateAreAllDrawnNumbers =
+            List.choose (function DrawnNumber x -> Some x | _ -> None) >> Success
         
         getDrawResultsWithoutExtraNumber
-        >=> validateDrawResultsWithoutExtraNumberLength
-        >=> validateDrawResultsWithoutExtraNumberAreAllDrawnNumbers
+        >=> validateSixMarkSixNumbers
+        >=> validateAreAllDrawnNumbers
 
     let drawResultsWithoutExtraNumber =
         drawResults
         |> List.rev
         |> validateDrawResultsWithoutExtraNumber
-    match drawResultsWithoutExtraNumber with
-    | Error e -> 
+
+    let usersDrawValidated = usersDraw |> validateSixMarkSixNumbers
+
+    match usersDrawValidated, drawResultsWithoutExtraNumber with
+    | Error e, Success _ | Success _, Error e -> 
         errorHandler e
         Error e
-    | Success s -> 
-        let mutable points = 0
-
-        for ud in usersDraw do
-            for dr in s do
-                if ud = dr
-                then points <- points + 1
-
-        Success points
+    | Error e1, Error e2 ->
+        errorHandler e1
+        errorHandler e2
+        let (ErrorMessage m1, ErrorMessage m2) = e1, e2
+        m1 + m2 |> ErrorMessage |> Error
+    | Success usersDraw, Success drawResultWithoutExtraNumber -> 
+        Set.intersect (Set.ofList usersDraw) (Set.ofList drawResultWithoutExtraNumber)
+        |> Set.count
+        |> ValidationResult.success
+//        let mutable points = 0
+//
+//        for ud in usersDraw do
+//            for dr in drawResultWithoutExtraNumber do
+//                if ud = dr
+//                then points <- points + 1
+//
+//        Success points

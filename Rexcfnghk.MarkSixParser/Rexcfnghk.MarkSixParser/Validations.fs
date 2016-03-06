@@ -19,6 +19,8 @@ module ValidationResult =
 
     let bind f = doubleMap f Error
 
-    let extract<'T> : ValidationResult<'T> -> 'T option = doubleMap Some (fun _ -> None)
+    let extractOption<'T> : ValidationResult<'T> -> 'T option = doubleMap Some (fun _ -> None)
+
+    let extract<'T> : ValidationResult<'T> -> 'T = doubleMap id (fun (ErrorMessage e) -> invalidOp e)
 
     let (>=>) f g = f >> bind g
