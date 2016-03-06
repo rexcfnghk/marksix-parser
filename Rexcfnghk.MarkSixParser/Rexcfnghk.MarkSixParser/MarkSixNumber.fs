@@ -17,7 +17,8 @@ type T =
 
     interface IEquatable<T> with
         member this.Equals other =
-            (this :> IComparable<T>).Equals other
+            let (MarkSixNumber thisInt, MarkSixNumber otherInt) = this, other
+            thisInt = otherInt
 
     override this.Equals other =
         (this :> IEquatable<T>).Equals(other :?> T)
