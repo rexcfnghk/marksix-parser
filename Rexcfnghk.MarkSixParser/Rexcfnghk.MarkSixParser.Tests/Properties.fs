@@ -13,6 +13,23 @@ let outOfRangeArb =
     |> Gen.suchThat (fun i -> i < 1 || i > 49)
     |> Arb.fromGen
 
+let drawResultsArb =
+    let drawnNumbersGen =
+        Gen.elements [1..49]
+        |> Gen.map (MarkSixNumber.create >> ValidationResult.extract >> DrawnNumber)
+        |> Gen.listOfLength 6
+
+    let extraNumberGen =
+        Gen.elements [1..49]
+        |> Gen.map (MarkSixNumber.create >> ValidationResult.extract >> ExtraNumber)
+        |> Gen.listOfLength 1
+
+    Gen.constant List.append 
+    <*> drawnNumbersGen
+    <*> extraNumberGen
+    |> Arb.fromGen
+    
+
 [<Property>]
 let ``drawRandom always returns six elements`` () =
     let numbers = MarkSix.drawNumbers ()
@@ -40,3 +57,15 @@ let ``getDrawResultNumbers always returns seven elements`` () =
 let ``MarkSixNumber.create returns error for integers out of range`` () =
     Prop.forAll outOfRangeArb <| fun x -> 
         test <@ match MarkSixNumber.create x with Error _ -> true | _ -> false @>
+
+[<Property>]
+let ``drawResultsArb returns six DrawnNumbers`` () =
+    Prop.forAll drawResultsArb <| fun l ->
+        let drawnNumbers, _ = List.partition (function DrawnNumber _ -> true | ExtraNumber _ -> false) l
+        List.length drawnNumbers =! 6
+
+[<Property>]
+let ``drawResultsArb returns one ExtraNumber`` () =
+    Prop.forAll drawResultsArb <| fun l ->
+        let _, extraNumbers = List.partition (function DrawnNumber _ -> true | ExtraNumber _ -> false) l
+        List.length extraNumbers =! 1
