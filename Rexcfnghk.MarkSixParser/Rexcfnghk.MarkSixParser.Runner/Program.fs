@@ -4,7 +4,7 @@ open Models
 open MarkSix
 open System
 
-let addDrawResultNumbers' = addDrawResultNumbers (Console.ReadLine >> int)
+let addDrawResultNumbers' = getDrawResultNumbers (Console.ReadLine >> int)
     
 [<EntryPoint>]
 let main argv = 

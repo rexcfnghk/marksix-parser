@@ -12,7 +12,7 @@ let drawNumbers () =
         |> MarkSixNumber.tryCreate
         |> Option.get ]
 
-let addDrawResultNumbers getNumber errorHandler =
+let getDrawResultNumbers getNumber errorHandler =
     let createFromGetNumber = getNumber >> MarkSixNumber.create
 
     let rec innerErrorHandler markSixElement e = 
@@ -22,7 +22,7 @@ let addDrawResultNumbers getNumber errorHandler =
         | Error e -> innerErrorHandler markSixElement e
 
     // FSharpSet requires comparison, which is not necessary in this case
-    let rec addDrawResultNumbersImpl (acc: HashSet<DrawResultElement>) =
+    let rec getDrawResultNumbersImpl (acc: HashSet<DrawResultElement>) =
         let count = acc.Count
         if count = 7
         then acc |> Seq.toList
@@ -32,6 +32,11 @@ let addDrawResultNumbers getNumber errorHandler =
                 createFromGetNumber ()
                 |> ValidationResult.doubleMap typer (innerErrorHandler typer)
             acc.Add element |> ignore
-            addDrawResultNumbersImpl acc
+            getDrawResultNumbersImpl acc
 
-    addDrawResultNumbersImpl <| HashSet()
+    getDrawResultNumbersImpl <| HashSet()
+
+//let checkResults drawResults = function
+//    | [] -> ValidationResult.error <| ErrorMessage "Input list is empty"
+//    | l ->
+//        List.fold2

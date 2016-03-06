@@ -3,6 +3,7 @@
 open System
 open Rexcfnghk.MarkSixParser
 open Models
+open Xunit
 open FsCheck
 open FsCheck.Xunit
 open Swensen.Unquote
@@ -24,12 +25,18 @@ let ``drawRandom always returns numbers between 1 and 49`` () =
     List.forall (MarkSixNumber.value >> isWithinRange) numbers
 
 [<Property>]
-let ``addDrawResultNumbers always add ExtraNumber at the end`` () =
+let ``getDrawResultNumbers always add ExtraNumber at the end`` () =
     let r = Random()
-    let resultListRev = List.rev <| MarkSix.addDrawResultNumbers (fun () -> r.Next(1, 50)) ignore
+    let resultListRev = List.rev <| MarkSix.getDrawResultNumbers (fun () -> r.Next(1, 50)) ignore
     match resultListRev with
     | (ExtraNumber _) :: _ -> true
     | _ -> false
+
+[<Property>]
+let ``getDrawResultNumbers always returns seven elements`` () =
+    let r = Random()
+    let result = MarkSix.getDrawResultNumbers (fun () -> r.Next(1, 50)) ignore
+    result.Length =! 7
 
 [<Property>]
 let ``MarkSixNumber.create returns error for integers out of range`` () =
