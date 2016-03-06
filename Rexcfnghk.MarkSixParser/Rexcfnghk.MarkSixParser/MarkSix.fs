@@ -1,9 +1,9 @@
-﻿module MarkSix
+﻿module Rexcfnghk.MarkSixParser.MarkSix
 
 open System
 open System.Collections.Generic
 open Models
-open Rexcfnghk.MarkSixParser
+open ValidationResult
 
 let drawNumbers () =
     let r = Random()
@@ -36,7 +36,41 @@ let getDrawResultNumbers getNumber errorHandler =
 
     getDrawResultNumbersImpl <| HashSet()
 
-//let checkResults drawResults = function
-//    | [] -> ValidationResult.error <| ErrorMessage "Input list is empty"
-//    | l ->
-//        List.fold2
+let checkResults errorHandler drawResults usersDraw =
+    let validateDrawResultsWithoutExtraNumber =
+        let validateDrawResultsWithoutExtraNumberLength input =
+            if List.length input = 6
+            then Success input
+            else 
+                "Draw result list has incorrect length"
+                |> ValidationResult.errorFromString
+
+        let validateDrawResultsWithoutExtraNumberAreAllDrawnNumbers input =
+            let allDrawnNumbers = 
+                List.forall (function DrawnNumber _ -> true | _ -> false) input
+            if allDrawnNumbers
+            then Success input
+            else 
+                "Draw result list contains more than one extra number"
+                |> ValidationResult.errorFromString
+
+        validateDrawResultsWithoutExtraNumberLength
+        >=> validateDrawResultsWithoutExtraNumberAreAllDrawnNumbers
+
+    let drawResultsWithoutExtraNumber =
+        drawResults
+        |> (List.rev >> List.tail)
+        |> validateDrawResultsWithoutExtraNumber
+    match drawResultsWithoutExtraNumber with
+    | Error e -> 
+        errorHandler e
+        Error e
+    | Success s -> 
+        let mutable points = 0
+
+        for ud in usersDraw do
+            for dr in s do
+                if ud = dr
+                then points <- points + 1
+
+        Success points

@@ -1,6 +1,4 @@
-﻿module MarkSixNumber
-
-open Rexcfnghk.MarkSixParser
+﻿module Rexcfnghk.MarkSixParser.MarkSixNumber
 
 type T = MarkSixNumber of int
 
@@ -10,7 +8,7 @@ let create input =
         |> (MarkSixNumber >> ValidationResult.success)
     else 
         "Input out of range"
-        |> (ErrorMessage >> ValidationResult.error)
+        |> ValidationResult.errorFromString
 
 let tryCreate = create >> ValidationResult.extract
 

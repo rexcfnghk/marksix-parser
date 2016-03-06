@@ -1,6 +1,4 @@
-﻿module MarkSixNumber
-
-open Rexcfnghk.MarkSixParser
+﻿module Rexcfnghk.MarkSixParser.MarkSixNumber
 
 type T
 

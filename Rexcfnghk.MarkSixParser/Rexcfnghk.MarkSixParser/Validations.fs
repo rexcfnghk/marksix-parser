@@ -7,14 +7,18 @@ type ValidationResult<'T> =
     | Error of ErrorMessage
 
 module ValidationResult =
-    let extract = function
-        | Success a -> Some a
-        | Error _ -> None
-
     let success = Success
 
     let error = Error
 
+    let errorFromString<'T> : string -> ValidationResult<'T> = ErrorMessage >> Error
+
     let doubleMap successHandler errorHandler = function
         | Success x -> successHandler x
         | Error e -> errorHandler e
+
+    let bind f = doubleMap f Error
+
+    let extract<'T> : ValidationResult<'T> -> 'T option = doubleMap Some (fun _ -> None)
+
+    let (>=>) f g = f >> bind g
