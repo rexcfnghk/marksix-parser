@@ -5,18 +5,21 @@ open System
 [<CustomComparison; CustomEquality>]
 type T = 
     | MarkSixNumber of int
+
     interface IComparable<T> with
         member this.CompareTo other =
             let (MarkSixNumber thisInt, MarkSixNumber otherInt) = this, other
             thisInt.CompareTo otherInt
+
     interface IComparable with
         member this.CompareTo other =
             (this :> IComparable<T>).CompareTo(other :?> T)
+
     interface IEquatable<T> with
         member this.Equals other =
-            this.Equals other
+            (this :> IComparable<T>).Equals other
     override this.Equals other =
-        (this :> IComparable).CompareTo other = 0
+        (this :> IEquatable<T>).Equals other
     override this.GetHashCode() =
         let (MarkSixNumber thisInt) = this
         thisInt
