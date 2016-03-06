@@ -20,7 +20,7 @@ type T =
             (this :> IComparable<T>).Equals other
 
     override this.Equals other =
-        (this :> IEquatable<T>).Equals other
+        (this :> IEquatable<T>).Equals(other :?> T)
 
     override this.GetHashCode() =
         let (MarkSixNumber thisInt) = this
