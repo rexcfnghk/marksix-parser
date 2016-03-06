@@ -76,11 +76,3 @@ let checkResults errorHandler drawResults usersDraw =
         Set.intersect (Set.ofList usersDraw) (Set.ofList drawResultWithoutExtraNumber)
         |> Set.count
         |> ValidationResult.success
-//        let mutable points = 0
-//
-//        for ud in usersDraw do
-//            for dr in drawResultWithoutExtraNumber do
-//                if ud = dr
-//                then points <- points + 1
-//
-//        Success points
