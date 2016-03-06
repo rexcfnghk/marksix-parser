@@ -18,8 +18,10 @@ type T =
     interface IEquatable<T> with
         member this.Equals other =
             (this :> IComparable<T>).Equals other
+
     override this.Equals other =
         (this :> IEquatable<T>).Equals other
+
     override this.GetHashCode() =
         let (MarkSixNumber thisInt) = this
         thisInt
