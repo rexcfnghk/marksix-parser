@@ -38,6 +38,10 @@ let getDrawResultNumbers getNumber errorHandler =
 
 let checkResults errorHandler drawResults usersDraw =
     let validateDrawResultsWithoutExtraNumber =
+        let getDrawResultsWithoutExtraNumber = function
+            | _ :: t -> ValidationResult.success t
+            | [] -> "Draw result list is empty" |> ValidationResult.errorFromString
+
         let validateDrawResultsWithoutExtraNumberLength input =
             if List.length input = 6
             then Success input
@@ -53,13 +57,14 @@ let checkResults errorHandler drawResults usersDraw =
             else 
                 "Draw result list contains more than one extra number"
                 |> ValidationResult.errorFromString
-
-        validateDrawResultsWithoutExtraNumberLength
+        
+        getDrawResultsWithoutExtraNumber
+        >=> validateDrawResultsWithoutExtraNumberLength
         >=> validateDrawResultsWithoutExtraNumberAreAllDrawnNumbers
 
     let drawResultsWithoutExtraNumber =
         drawResults
-        |> (List.rev >> List.tail)
+        |> List.rev
         |> validateDrawResultsWithoutExtraNumber
     match drawResultsWithoutExtraNumber with
     | Error e -> 
