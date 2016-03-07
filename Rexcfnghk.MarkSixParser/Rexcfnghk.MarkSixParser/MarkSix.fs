@@ -61,11 +61,9 @@ let checkResults errorHandler drawResults usersDraw =
         splitDrawResults
         >=> validateOneExtraNumbersWithSixDrawnumbers
 
-    let drawResultsValidated =
-        drawResults
-        |> validateDrawResultsWithoutExtraNumber
-
-    let usersDrawValidated = usersDraw |> validateSixMarkSixNumbers
+    let drawResultsValidated, usersDrawValidated =
+        drawResults |> validateDrawResultsWithoutExtraNumber,
+        usersDraw |> validateSixMarkSixNumbers
 
     match usersDrawValidated, drawResultsValidated with
     | Error e, Success _ | Success _, Error e -> 
@@ -77,6 +75,14 @@ let checkResults errorHandler drawResults usersDraw =
         let (ErrorMessage m1, ErrorMessage m2) = e1, e2
         m1 + m2 |> ErrorMessage |> Error
     | Success usersDraw, Success (extraNumber, drawResultWithoutExtraNumber) -> 
-        Set.intersect (Set.ofList usersDraw) (Set.ofList drawResultWithoutExtraNumber)
-        |> Set.count
-        |> ValidationResult.success
+        let points = 
+            Set.intersect (Set.ofList usersDraw) (Set.ofList drawResultWithoutExtraNumber)
+            |> Set.count
+            |> decimal
+
+        let extraPoints = 
+            match List.tryFind ((=) extraNumber) usersDraw with
+            | Some _ -> 0.5m
+            | None -> 0.m
+
+        points + extraPoints |> ValidationResult.success
