@@ -51,18 +51,15 @@ let checkResults errorHandler drawResults usersDraw =
             | [] -> "Draw result list is empty" |> ValidationResult.errorFromString
 
         let validateOneExtraNumbersWithSixDrawnumbers (extraNumber, drawnNumbers) =
-            if List.length drawnNumbers = 6
-            then Success (extraNumber, drawnNumbers)
-            else "There should be exactly six drawn numbers" |> ValidationResult.errorFromString
+            let drawnNumbersAreAllDrawnNumbers = List.forall (function DrawnNumber _ -> true | _ -> false) drawnNumbers
+            let extraNumberIsExtraNumber = (function ExtraNumber _ -> true | _ -> false) extraNumber
 
-        let validateAreAllDrawnNumbers (extraNumber, drawnNumbers) =
-            Success (extraNumber,
-                        drawnNumbers 
-                        |> List.choose (function DrawnNumber x -> Some x | _ -> None))
-        
+            if List.length drawnNumbers = 6 && drawnNumbersAreAllDrawnNumbers && extraNumberIsExtraNumber
+            then Success (extraNumber, drawnNumbers)
+            else "There should be exactly six drawn numbers and one extra number" |> ValidationResult.errorFromString
+
         splitDrawResults
         >=> validateOneExtraNumbersWithSixDrawnumbers
-        >=> validateAreAllDrawnNumbers
 
     let drawResultsValidated =
         drawResults
