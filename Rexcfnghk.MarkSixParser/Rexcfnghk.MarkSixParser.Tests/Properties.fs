@@ -69,3 +69,7 @@ let ``drawResultsArb returns one ExtraNumber`` () =
     Prop.forAll drawResultsArb <| fun l ->
         let _, extraNumbers = List.partition (function DrawnNumber _ -> true | ExtraNumber _ -> false) l
         List.length extraNumbers =! 1
+
+[<Property>]
+let ``drawResultsArb returns six DrawnNumbers and one ExtraNumber`` () =
+    ``drawResultsArb returns six DrawnNumbers`` .&. ``drawResultsArb returns one ExtraNumber``
