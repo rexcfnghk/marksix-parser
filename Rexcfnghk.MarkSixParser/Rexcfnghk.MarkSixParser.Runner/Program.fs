@@ -1,14 +1,19 @@
-﻿// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
-//open Models
-//open MarkSix
-//open System
-//
-//let addDrawResultNumbers' = getDrawResultNumbers (Console.ReadLine >> int)
+﻿open Rexcfnghk.MarkSixParser
+open System
+
+let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") (Console.ReadLine >> int)
+
+let getUsersDrawNumbers' () = MarkSix.getUsersDrawNumber (printfn "%A") (Console.ReadLine >> int)
+
+let checkResults' = MarkSix.checkResults (printfn "%A")
     
-//[<EntryPoint>]
-//let main argv = 
-//    let result = MarkSix.drawNumbers()
-//    printfn "%A" result
-//    System.Console.ReadLine() |> ignore
-//    0 // return an integer exit code
+[<EntryPoint>]
+let main _ = 
+    printfn "Enter draw results"
+    let drawResults = getDrawResultNumbers' ()
+    printfn "The draw results are %A" drawResults
+    let usersDraw = getUsersDrawNumbers' ()
+    printfn "The draw results are %A" usersDraw
+    let prize = checkResults' drawResults usersDraw
+    printfn "Your prize is %A"  prize
+    0 // return an integer exit code
