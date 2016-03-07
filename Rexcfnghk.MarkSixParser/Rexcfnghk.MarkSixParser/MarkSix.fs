@@ -52,7 +52,7 @@ let checkResults errorHandler drawResults usersDraw =
 
         let validateOneExtraNumbersWithSixDrawnumbers (extraNumber, drawnNumbers) =
             let drawnNumbersAreAllDrawnNumbers = List.choose (function DrawnNumber x -> Some x | _ -> None) drawnNumbers
-            let extraNumberIsExtraNumber = (function ExtraNumber _ -> true | _ -> false) extraNumber
+            let extraNumberIsExtraNumber, extraNumber = (function ExtraNumber x -> true, x | DrawnNumber y -> false, y) extraNumber
 
             if List.length drawnNumbersAreAllDrawnNumbers = 6 && extraNumberIsExtraNumber
             then Success (extraNumber, drawnNumbersAreAllDrawnNumbers)
