@@ -37,15 +37,20 @@ let private addUniqueToList maxCount successHandler errorHandler getNumber =
             addUniqueToListImpl acc
 
     addUniqueToListImpl <| HashSet()
-    
+
+[<Literal>]
+let MaxDrawResultCount = 7
+
+[<Literal>]
+let MaxUsersDrawCount = 6
 
 let getDrawResultNumbers =
-    let successHandler count = if count = 6 then ExtraNumber else DrawnNumber
-    addUniqueToList 7 successHandler
+    let successHandler = function 6 -> ExtraNumber | _ -> DrawnNumber
+    addUniqueToList MaxDrawResultCount successHandler
 
 let getUsersDrawNumber =
     let successHandler _ = id
-    addUniqueToList 6 successHandler
+    addUniqueToList MaxUsersDrawCount successHandler
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique (drawResults: 'T list) =
