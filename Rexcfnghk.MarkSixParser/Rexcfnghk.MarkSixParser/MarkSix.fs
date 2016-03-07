@@ -14,29 +14,38 @@ let drawNumbers () =
         |> MarkSixNumber.create
         |> ValidationResult.extract ]
 
-let getDrawResultNumbers getNumber errorHandler =
+let private addUniqueToList maxCount successHandler errorHandler getNumber =
     let createFromGetNumber = getNumber >> MarkSixNumber.create
 
-    let rec innerErrorHandler markSixElement e = 
+    let rec retryErrorHandler successHandler e = 
         errorHandler e
         match createFromGetNumber () with
-        | Success x -> markSixElement x
-        | Error e -> innerErrorHandler markSixElement e
+        | Success x -> successHandler x
+        | Error e -> retryErrorHandler successHandler e
 
     // FSharpSet requires comparison, which is not necessary in this case
-    let rec getDrawResultNumbersImpl (acc: HashSet<DrawResultElement>) =
+    let rec addUniqueToListImpl (acc: HashSet<'T>) =
         let count = acc.Count
-        if count = 7
+        if count = maxCount
         then acc |> Seq.toList
         else
-            let typer = if count = 6 then ExtraNumber else DrawnNumber
+            let innerSuccessHandler = successHandler count
             let element = 
                 createFromGetNumber ()
-                |> ValidationResult.doubleMap typer (innerErrorHandler typer)
+                |> ValidationResult.doubleMap innerSuccessHandler (retryErrorHandler innerSuccessHandler)
             acc.Add element |> ignore
-            getDrawResultNumbersImpl acc
+            addUniqueToListImpl acc
 
-    getDrawResultNumbersImpl <| HashSet()
+    addUniqueToListImpl <| HashSet()
+    
+
+let getDrawResultNumbers =
+    let successHandler count = if count = 6 then ExtraNumber else DrawnNumber
+    addUniqueToList 7 successHandler
+
+let getUsersDrawNumber =
+    let successHandler _ = id
+    addUniqueToList 6 successHandler
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique (drawResults: 'T list) =
