@@ -16,7 +16,7 @@ type T =
         | First -> "First"
         | Second -> "Second"
         | Third -> "Third"
-        | Normal p -> sprintf "Fixed prize of %A" p
+        | Normal p -> sprintf "Fixed prize of %s" <| (decimal p).ToString("C")
         | NoPrize -> "No prize"
     member this.AsString = this.ToString()
 
