@@ -17,6 +17,11 @@ let markSixNumberGen =
     Gen.elements [1..49]
     |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
 
+let usersDrawArb = 
+    markSixNumberGen
+    |> Gen.listOfLength 6
+    |> Arb.fromGen
+
 let drawResultsArb =
     let drawnNumbersGen =
         markSixNumberGen
