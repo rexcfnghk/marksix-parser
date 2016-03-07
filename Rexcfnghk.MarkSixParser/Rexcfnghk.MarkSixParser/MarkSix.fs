@@ -3,6 +3,7 @@
 open System
 open System.Collections.Generic
 open Models
+open Points
 open ValidationResult
 
 let drawNumbers () =
@@ -87,13 +88,14 @@ let checkResults errorHandler drawResults usersDraw =
         m1 + m2 |> ErrorMessage |> Error
     | Success usersDraw, Success (extraNumber, drawResultWithoutExtraNumber) -> 
         let points = 
-            Set.intersect (Set.ofList usersDraw) (Set.ofList drawResultWithoutExtraNumber)
+            (Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber)
+            ||> Set.intersect
             |> Set.count
-            |> decimal
+            |> (decimal >> Points)
 
         let extraPoints = 
             match List.tryFind ((=) extraNumber) usersDraw with
-            | Some _ -> 0.5m
-            | None -> 0.m
+            | Some _ -> Points 0.5m
+            | None -> Points 0.m
 
-        points + extraPoints |> ValidationResult.success
+        points .+. extraPoints |> Points.getPrize |> ValidationResult.success
