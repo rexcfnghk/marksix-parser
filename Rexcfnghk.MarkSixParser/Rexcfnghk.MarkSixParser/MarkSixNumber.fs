@@ -9,7 +9,7 @@ type T =
     interface IComparable<T> with
         member this.CompareTo other =
             let (MarkSixNumber thisInt, MarkSixNumber otherInt) = this, other
-            thisInt.CompareTo otherInt
+            compare thisInt otherInt
 
     interface IComparable with
         member this.CompareTo other =
