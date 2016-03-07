@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open Models
 open Points
+open Prize
 open ValidationResult
 
 let drawNumbers () =
@@ -98,4 +99,4 @@ let checkResults errorHandler drawResults usersDraw =
             | Some _ -> Points 0.5m
             | None -> Points 0.m
 
-        points .+. extraPoints |> Points.getPrize |> ValidationResult.success
+        points .+. extraPoints |> Prize.fromPoints |> ValidationResult.success
