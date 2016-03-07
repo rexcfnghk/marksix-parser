@@ -45,25 +45,32 @@ let checkResults errorHandler drawResults usersDraw =
             |> ValidationResult.errorFromString
 
     let validateDrawResultsWithoutExtraNumber =
-        let getDrawResultsWithoutExtraNumber = function
-            | _ :: t -> ValidationResult.success t
+        let splitDrawResults drawResults =
+            match List.rev drawResults with
+            | h :: t -> ValidationResult.success (h, t)
             | [] -> "Draw result list is empty" |> ValidationResult.errorFromString
 
-        let validateAreAllDrawnNumbers =
-            List.choose (function DrawnNumber x -> Some x | _ -> None) >> Success
+        let validateOneExtraNumbersWithSixDrawnumbers (extraNumber, drawnNumbers) =
+            if List.length drawnNumbers = 6
+            then Success (extraNumber, drawnNumbers)
+            else "There should be exactly six drawn numbers" |> ValidationResult.errorFromString
+
+        let validateAreAllDrawnNumbers (extraNumber, drawnNumbers) =
+            Success (extraNumber,
+                        drawnNumbers 
+                        |> List.choose (function DrawnNumber x -> Some x | _ -> None))
         
-        getDrawResultsWithoutExtraNumber
-        >=> validateSixMarkSixNumbers
+        splitDrawResults
+        >=> validateOneExtraNumbersWithSixDrawnumbers
         >=> validateAreAllDrawnNumbers
 
-    let drawResultsWithoutExtraNumber =
+    let drawResultsValidated =
         drawResults
-        |> List.rev
         |> validateDrawResultsWithoutExtraNumber
 
     let usersDrawValidated = usersDraw |> validateSixMarkSixNumbers
 
-    match usersDrawValidated, drawResultsWithoutExtraNumber with
+    match usersDrawValidated, drawResultsValidated with
     | Error e, Success _ | Success _, Error e -> 
         errorHandler e
         Error e
@@ -72,7 +79,7 @@ let checkResults errorHandler drawResults usersDraw =
         errorHandler e2
         let (ErrorMessage m1, ErrorMessage m2) = e1, e2
         m1 + m2 |> ErrorMessage |> Error
-    | Success usersDraw, Success drawResultWithoutExtraNumber -> 
+    | Success usersDraw, Success (extraNumber, drawResultWithoutExtraNumber) -> 
         Set.intersect (Set.ofList usersDraw) (Set.ofList drawResultWithoutExtraNumber)
         |> Set.count
         |> ValidationResult.success
