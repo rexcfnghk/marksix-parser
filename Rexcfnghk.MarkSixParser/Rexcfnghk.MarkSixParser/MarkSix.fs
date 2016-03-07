@@ -37,14 +37,24 @@ let getDrawResultNumbers getNumber errorHandler =
     getDrawResultNumbersImpl <| HashSet()
 
 let checkResults errorHandler drawResults usersDraw =
-    let validateSixMarkSixNumbers input =
-        if List.length input = 6
-        then Success input
-        else 
-            "MarkSixNumber list has incorrect length"
-            |> ValidationResult.errorFromString
+    let allElementsAreUnique (drawResults: 'T list) =
+        let set = HashSet(drawResults)
+        if set.Count = drawResults.Length
+        then Success drawResults
+        else "There are duplicates in draw result list" |> ValidationResult.errorFromString
 
-    let validateDrawResultsWithoutExtraNumber =
+    let validateUsersDraw =
+        let validateUsersDrawLength input = 
+            if List.length input = 6
+            then Success input
+            else 
+                "MarkSixNumber list has incorrect length"
+                |> ValidationResult.errorFromString
+
+        allElementsAreUnique
+        >=> validateUsersDrawLength
+
+    let validateDrawResults =
         let splitDrawResults drawResults =
             match List.rev drawResults with
             | h :: t -> ValidationResult.success (h, t)
@@ -58,12 +68,13 @@ let checkResults errorHandler drawResults usersDraw =
             then Success (extraNumber, drawnNumbersAreAllDrawnNumbers)
             else "There should be exactly six drawn numbers and one extra number" |> ValidationResult.errorFromString
 
-        splitDrawResults
+        allElementsAreUnique
+        >=> splitDrawResults
         >=> validateOneExtraNumbersWithSixDrawnumbers
 
     let drawResultsValidated, usersDrawValidated =
-        drawResults |> validateDrawResultsWithoutExtraNumber,
-        usersDraw |> validateSixMarkSixNumbers
+        drawResults |> validateDrawResults,
+        usersDraw |> validateUsersDraw
 
     match usersDrawValidated, drawResultsValidated with
     | Error e, Success _ | Success _, Error e -> 
