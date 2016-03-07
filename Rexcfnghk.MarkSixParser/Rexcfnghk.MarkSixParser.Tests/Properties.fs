@@ -13,18 +13,22 @@ let outOfRangeArb =
     |> Gen.suchThat (fun i -> i < 1 || i > 49)
     |> Arb.fromGen
 
+let markSixNumberGen =
+    Gen.elements [1..49]
+    |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
+
 let drawResultsArb =
     let drawnNumbersGen =
-        Gen.elements [1..49]
-        |> Gen.map (MarkSixNumber.create >> ValidationResult.extract >> DrawnNumber)
+        markSixNumberGen
+        |> Gen.map DrawnNumber
         |> Gen.listOfLength 6
 
     let extraNumberGen =
-        Gen.elements [1..49]
-        |> Gen.map (MarkSixNumber.create >> ValidationResult.extract >> ExtraNumber)
+        markSixNumberGen
+        |> Gen.map ExtraNumber
         |> Gen.listOfLength 1
 
-    Gen.constant List.append 
+    Gen.constant List.append
     <*> drawnNumbersGen
     <*> extraNumberGen
     |> Arb.fromGen
