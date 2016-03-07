@@ -51,11 +51,11 @@ let checkResults errorHandler drawResults usersDraw =
             | [] -> "Draw result list is empty" |> ValidationResult.errorFromString
 
         let validateOneExtraNumbersWithSixDrawnumbers (extraNumber, drawnNumbers) =
-            let drawnNumbersAreAllDrawnNumbers = List.forall (function DrawnNumber _ -> true | _ -> false) drawnNumbers
+            let drawnNumbersAreAllDrawnNumbers = List.choose (function DrawnNumber x -> Some x | _ -> None) drawnNumbers
             let extraNumberIsExtraNumber = (function ExtraNumber _ -> true | _ -> false) extraNumber
 
-            if List.length drawnNumbers = 6 && drawnNumbersAreAllDrawnNumbers && extraNumberIsExtraNumber
-            then Success (extraNumber, drawnNumbers)
+            if List.length drawnNumbersAreAllDrawnNumbers = 6 && extraNumberIsExtraNumber
+            then Success (extraNumber, drawnNumbersAreAllDrawnNumbers)
             else "There should be exactly six drawn numbers and one extra number" |> ValidationResult.errorFromString
 
         splitDrawResults
