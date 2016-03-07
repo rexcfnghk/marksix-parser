@@ -4,12 +4,21 @@ open Models
 
 [<Measure>] type hkd
 
+[<StructuredFormatDisplay("{AsString}")>]
 type T =
     | First
     | Second
     | Third
     | Normal of decimal<hkd>
     | NoPrize
+    override this.ToString() =
+        match this with
+        | First -> "First"
+        | Second -> "Second"
+        | Third -> "Third"
+        | Normal p -> sprintf "Fixed prize of %A" p
+        | NoPrize -> "No prize"
+    member this.AsString = this.ToString()
 
 let fromPoints = function
     | Points 3m -> Normal 40m<hkd>

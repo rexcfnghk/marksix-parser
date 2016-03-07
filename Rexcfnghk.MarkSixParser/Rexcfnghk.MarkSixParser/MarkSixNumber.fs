@@ -3,6 +3,7 @@
 open System
 
 [<CustomComparison; CustomEquality>]
+[<StructuredFormatDisplay("{AsString}")>]
 type T = 
     | MarkSixNumber of int
 
@@ -26,6 +27,10 @@ type T =
     override this.GetHashCode() =
         let (MarkSixNumber thisInt) = this
         thisInt
+
+    override this.ToString() = sprintf "%i" <| this.GetHashCode()
+
+    member this.AsString = this.ToString()
 
 let create input = 
     if input >= 1 && input <= 49 then
