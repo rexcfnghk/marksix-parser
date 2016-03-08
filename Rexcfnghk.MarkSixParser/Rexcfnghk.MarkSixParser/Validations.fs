@@ -23,10 +23,6 @@ module ValidationResult =
         | Success x -> successHandler x
         | Error e -> errorHandler e
 
-    let map f = doubleMap (f >> Success) Error
-
-    let (<!>) = map
-
     let bind f = doubleMap f Error
 
     let (>>=) x f = bind f x
