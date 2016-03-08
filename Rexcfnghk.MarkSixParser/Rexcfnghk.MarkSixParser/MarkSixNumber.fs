@@ -40,6 +40,4 @@ let create input =
         "Input out of range"
         |> ValidationResult.errorFromString
 
-let createOption = create >> ValidationResult.extractOption
-
 let value (MarkSixNumber num) = num
