@@ -1,7 +1,5 @@
 ﻿namespace Rexcfnghk.MarkSixParser
 
-open System
-
 type ErrorMessage = ErrorMessage of string
 
 [<StructuredFormatDisplay("{AsString}")>]

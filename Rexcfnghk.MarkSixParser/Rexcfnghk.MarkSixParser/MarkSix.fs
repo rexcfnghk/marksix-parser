@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open Models
 open Points
-open Prize
 open ValidationResult
 
 let drawNumbers () =
