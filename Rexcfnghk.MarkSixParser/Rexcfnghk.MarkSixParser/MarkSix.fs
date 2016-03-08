@@ -14,7 +14,13 @@ let drawNumbers () =
         |> ValidationResult.extract ]
 
 let private addUniqueToList maxCount successHandler errorHandler getNumber =
+
     let createFromGetNumber = getNumber >> MarkSixNumber.create
+
+    let addToHashSet (acc: HashSet<_>) input =
+        if acc.Add input
+        then input |> ValidationResult.success
+        else "Adding duplicate elements" |> ValidationResult.errorFromString
 
     let rec retryErrorHandler successHandler e = 
         errorHandler e
@@ -23,16 +29,18 @@ let private addUniqueToList maxCount successHandler errorHandler getNumber =
         | Error e -> retryErrorHandler successHandler e
 
     // FSharpSet requires comparison, which is not necessary in this case
-    let rec addUniqueToListImpl (acc: HashSet<'T>) =
+    let rec addUniqueToListImpl (acc: HashSet<_>) =
         let count = acc.Count
         if count = maxCount
         then acc |> Seq.toList
         else
             let innerSuccessHandler = successHandler count
-            let element = 
-                createFromGetNumber ()
-                |> ValidationResult.doubleMap innerSuccessHandler (retryErrorHandler innerSuccessHandler)
-            acc.Add element |> ignore
+
+            createFromGetNumber ()
+            |> ValidationResult.doubleMap innerSuccessHandler (retryErrorHandler innerSuccessHandler)
+            |> addToHashSet acc
+            |> ValidationResult.doubleMap ignore errorHandler
+
             addUniqueToListImpl acc
 
     addUniqueToListImpl <| HashSet()
