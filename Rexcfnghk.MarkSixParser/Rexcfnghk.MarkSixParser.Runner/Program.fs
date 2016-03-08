@@ -14,7 +14,7 @@ let main _ =
     printfn "The draw results are %A" drawResults
     printfn "Enter user's draw"
     let usersDraw = getUsersDrawNumbers' ()
-    printfn "The draw results are %A" usersDraw
+    printfn "User's draw is %A" usersDraw
     let prize = checkResults' drawResults usersDraw
     printfn "Your prize is %A"  prize
 
