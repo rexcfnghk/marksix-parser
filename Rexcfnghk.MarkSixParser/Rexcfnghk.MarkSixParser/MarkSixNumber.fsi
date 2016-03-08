@@ -10,6 +10,4 @@ type T =
 
 val create : int -> ValidationResult<T>
 
-val createOption : (int -> T option)
-
 val value : T -> int
