@@ -1,10 +1,18 @@
 ﻿namespace Rexcfnghk.MarkSixParser
 
+open System
+
 type ErrorMessage = ErrorMessage of string
 
+[<StructuredFormatDisplay("{AsString}")>]
 type ValidationResult<'T> =
     | Success of 'T
     | Error of ErrorMessage
+    override this.ToString() =
+        match this with
+        | Success s -> sprintf "%A" s
+        | Error e -> sprintf "%A" e
+    member this.AsString = this.ToString()
 
 module ValidationResult =
     let success = Success
