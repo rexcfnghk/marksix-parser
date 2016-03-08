@@ -1,2 +1,8 @@
-language: fsharp
+language: csharp
 solution: ./Rexcfnghk.MarkSixParser/Rexcfnghk.MarkSixParser.sln
+install:
+  - nuget restore ./Rexcfnghk.MarkSixParser/Rexcfnghk.MarkSixParser.sln
+  - nuget install xunit.runner.console -Version 2.1.0 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release ./Rexcfnghk.MarkSixParser/Rexcfnghk.MarkSixParser.sln
+  - mono ./Rexcfnghk.MarkSixParser/testrunner/xunit.runner.console.2.1.0/tools/xunit.console.exe ./Rexcfnghk.MarkSixParser/Rexcfnghk.MarkSixParser.Tests/bin/Release/Rexcfnghk.MarkSixParser.Tests.dll
