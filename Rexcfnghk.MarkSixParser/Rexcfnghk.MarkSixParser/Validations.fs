@@ -2,9 +2,15 @@
 
 type ErrorMessage = ErrorMessage of string
 
+[<StructuredFormatDisplay("{AsString}")>]
 type ValidationResult<'T> =
     | Success of 'T
     | Error of ErrorMessage
+    override this.ToString() =
+        match this with
+        | Success s -> sprintf "%A" s
+        | Error e -> sprintf "%A" e
+    member this.AsString = this.ToString()
 
 module ValidationResult =
     let success = Success
@@ -17,7 +23,13 @@ module ValidationResult =
         | Success x -> successHandler x
         | Error e -> errorHandler e
 
+    let map f = doubleMap (f >> Success) Error
+
+    let (<!>) = map
+
     let bind f = doubleMap f Error
+
+    let (>>=) x f = bind f x
 
     let extractOption<'T> : ValidationResult<'T> -> 'T option = doubleMap Some (fun _ -> None)
 

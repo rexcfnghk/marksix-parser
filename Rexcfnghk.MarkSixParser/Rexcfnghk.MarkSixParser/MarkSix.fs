@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open Models
 open Points
-open Prize
 open ValidationResult
 
 let drawNumbers () =
@@ -17,23 +16,24 @@ let drawNumbers () =
 let private addUniqueToList maxCount successHandler errorHandler getNumber =
     let createFromGetNumber = getNumber >> MarkSixNumber.create
 
-    let rec retryErrorHandler successHandler e = 
-        errorHandler e
-        match createFromGetNumber () with
-        | Success x -> successHandler x
-        | Error e -> retryErrorHandler successHandler e
+    let addToHashSet (acc: HashSet<_>) input =
+        if acc.Add input
+        then input |> ValidationResult.success
+        else "Adding duplicate elements" |> ValidationResult.errorFromString
 
     // FSharpSet requires comparison, which is not necessary in this case
-    let rec addUniqueToListImpl (acc: HashSet<'T>) =
+    let rec addUniqueToListImpl (acc: HashSet<_>) =
         let count = acc.Count
         if count = maxCount
         then acc |> Seq.toList
         else
             let innerSuccessHandler = successHandler count
-            let element = 
-                createFromGetNumber ()
-                |> ValidationResult.doubleMap innerSuccessHandler (retryErrorHandler innerSuccessHandler)
-            acc.Add element |> ignore
+
+            innerSuccessHandler
+            <!> createFromGetNumber ()
+            >>= addToHashSet acc
+            |> ValidationResult.doubleMap ignore errorHandler
+
             addUniqueToListImpl acc
 
     addUniqueToListImpl <| HashSet()

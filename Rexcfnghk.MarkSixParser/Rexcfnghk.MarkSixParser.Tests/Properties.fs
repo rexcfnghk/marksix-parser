@@ -33,9 +33,7 @@ let drawResultsArb =
         |> Gen.map ExtraNumber
         |> Gen.listOfLength 1
 
-    Gen.constant List.append
-    <*> drawnNumbersGen
-    <*> extraNumberGen
+    List.append <!> drawnNumbersGen <*> extraNumberGen
     |> Arb.fromGen
     
 
