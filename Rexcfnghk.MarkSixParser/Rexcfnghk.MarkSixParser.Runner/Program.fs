@@ -1,12 +1,7 @@
-﻿open Rexcfnghk.MarkSixParser
+﻿open UseCases
+
 open System
 
-let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") (Console.ReadLine >> int)
-
-let getUsersDrawNumbers' () = MarkSix.getUsersDrawNumber (printfn "%A") (Console.ReadLine >> int)
-
-let checkResults' = MarkSix.checkResults (printfn "%A")
-    
 [<EntryPoint>]
 let main _ = 
     printfn "Enter draw results"
