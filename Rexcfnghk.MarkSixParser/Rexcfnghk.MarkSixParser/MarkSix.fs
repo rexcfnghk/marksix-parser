@@ -43,7 +43,7 @@ let MaxUsersDrawCount = 6
 
 let getDrawResultNumbers errorHandler getNumber =
     addUniqueToList MaxDrawResultCount errorHandler getNumber 
-    |> List.mapi (fun i e -> if i = 6 then ExtraNumber e else DrawnNumber e)
+    |> List.mapi (fun i -> if i = 6 then ExtraNumber else DrawnNumber)
 
 let getUsersDrawNumber =
     addUniqueToList MaxUsersDrawCount
