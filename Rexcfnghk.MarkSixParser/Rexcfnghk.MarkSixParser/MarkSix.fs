@@ -49,7 +49,7 @@ let getUsersDrawNumber =
     addUniqueToList MaxUsersDrawCount
 
 let checkResults errorHandler drawResults usersDraw =
-    let allElementsAreUnique (drawResults: 'T list) =
+    let allElementsAreUnique (drawResults: _ list) =
         let set = HashSet(drawResults)
         if set.Count = drawResults.Length
         then Success drawResults
