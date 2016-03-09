@@ -13,7 +13,7 @@ let drawNumbers () =
         |> MarkSixNumber.create
         |> ValidationResult.extract ]
 
-let private addUniqueToList maxCount successHandler errorHandler getNumber =
+let private addUniqueToList maxCount errorHandler getNumber =
     let createFromGetNumber = getNumber >> MarkSixNumber.create
 
     let addToHashSet (acc: HashSet<_>) input =
@@ -27,10 +27,7 @@ let private addUniqueToList maxCount successHandler errorHandler getNumber =
         if count = maxCount
         then acc |> Seq.toList
         else
-            let innerSuccessHandler = successHandler count
-
-            innerSuccessHandler
-            <!> createFromGetNumber ()
+            createFromGetNumber ()
             >>= addToHashSet acc
             |> ValidationResult.doubleMap ignore errorHandler
 
@@ -44,13 +41,12 @@ let MaxDrawResultCount = 7
 [<Literal>]
 let MaxUsersDrawCount = 6
 
-let getDrawResultNumbers =
-    let successHandler = function 6 -> ExtraNumber | _ -> DrawnNumber
-    addUniqueToList MaxDrawResultCount successHandler
+let getDrawResultNumbers errorHandler getNumber =
+    addUniqueToList MaxDrawResultCount errorHandler getNumber 
+    |> List.mapi (fun i e -> if i = 6 then ExtraNumber e else DrawnNumber e)
 
 let getUsersDrawNumber =
-    let successHandler _ = id
-    addUniqueToList MaxUsersDrawCount successHandler
+    addUniqueToList MaxUsersDrawCount
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique (drawResults: 'T list) =
