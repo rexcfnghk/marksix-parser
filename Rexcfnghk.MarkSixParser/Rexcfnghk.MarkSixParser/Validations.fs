@@ -34,3 +34,12 @@ module ValidationResult =
     let extract<'T> : ValidationResult<'T> -> 'T = doubleMap id (fun (ErrorMessage e) -> invalidOp e)
 
     let (>=>) f g = f >> bind g
+
+    let validateFromList f = 
+        let rec validateFromListImpl acc = function
+            | [] -> Success acc
+            | h :: t ->
+                match f h with
+                | Success x -> validateFromListImpl (x :: acc) t
+                | Error e -> Error e
+        validateFromListImpl []
