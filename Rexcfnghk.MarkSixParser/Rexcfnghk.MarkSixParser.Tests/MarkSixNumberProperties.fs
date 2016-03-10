@@ -4,6 +4,7 @@ open Rexcfnghk.MarkSixParser
 open FsCheck
 open FsCheck.Xunit
 open Swensen.Unquote
+open System
 
 let outOfRangeArb =
     Arb.Default.Int32().Generator
@@ -20,7 +21,7 @@ let ``MarkSixNumber.create returns error for integers out of range`` () =
         test <@ match MarkSixNumber.create x with Error _ -> true | _ -> false @>
 
 [<Property>]
-let ``MarkSixNumber's custom equality works`` () =
+let ``Wrapping and unwrapping MarkSixNumber gives same underlying int`` () =
     let markSixNumberArb = markSixNumberGen |> Arb.fromGen
     Prop.forAll markSixNumberArb <| fun m -> 
         m 
@@ -28,3 +29,15 @@ let ``MarkSixNumber's custom equality works`` () =
         |> MarkSixNumber.create
         |> ValidationResult.extract
         =! m
+
+[<Property>]
+let ``x less than y infers MarkSixNumber<x> is less than MarkSixNumber<y>`` () =
+    let xyGenerator =
+        Gen.elements [1..49]
+        |> Gen.two
+        |> Gen.suchThat (fun (x, y) -> x.CompareTo y < 0)
+        |> Arb.fromGen
+    let extract = MarkSixNumber.create >> ValidationResult.extract
+    Prop.forAll xyGenerator <| fun (x, y) ->
+        let m1, m2 = extract x, extract y
+        (m1 :> IComparable<MarkSixNumber.T>).CompareTo(m2) <! 0
