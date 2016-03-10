@@ -29,4 +29,3 @@ let fromPoints = function
     | Points 5.5m -> Second
     | Points 6m -> First
     | _ -> NoPrize
-

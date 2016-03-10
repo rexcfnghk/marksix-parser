@@ -59,3 +59,37 @@ let ``drawResultsArb returns six DrawnNumbers and one ExtraNumber`` () =
     Prop.forAll drawResultsArb <| fun l ->
         let drawnNumbers, extraNumbers = List.partition (function DrawnNumber _ -> true | ExtraNumber _ -> false) l
         test <@ List.length drawnNumbers = 6 && List.length extraNumbers = 1 @>
+
+[<Property>]
+let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw`` () =
+    let splitDrawResults drawResults =
+        let splitter = List.map (function DrawnNumber n | ExtraNumber n -> n) >> List.rev
+        match splitter drawResults with
+        | [] -> failwith "Should not reach here"
+        | h :: t -> t, h
+
+    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
+        let points = 
+            (Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber)
+            ||> Set.intersect
+            |> Set.count
+            |> decimal
+
+        let extraPoints = 
+            match List.tryFind ((=) extraNumber) usersDraw with
+            | Some _ -> 0.5m
+            | None -> 0.m
+
+        points + extraPoints |> Points
+    
+    Prop.forAll drawResultsArb <| fun drawResults ->
+        Prop.forAll usersDrawArb <| fun usersDraw ->
+            let expected = 
+                calculatePoints usersDraw (splitDrawResults drawResults)
+                |> Prize.fromPoints
+ 
+            let actual =
+                MarkSix.checkResults ignore drawResults usersDraw
+                |> ValidationResult.extract
+
+            actual =! expected
