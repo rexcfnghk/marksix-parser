@@ -7,11 +7,6 @@ open FsCheck
 open FsCheck.Xunit
 open Swensen.Unquote
 
-let outOfRangeArb =
-    Arb.Default.Int32().Generator
-    |> Gen.suchThat (fun i -> i < 1 || i > 49)
-    |> Arb.fromGen
-
 let markSixNumberGen =
     Gen.elements [1..49]
     |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
@@ -60,11 +55,6 @@ let ``getDrawResultNumbers always returns seven elements`` () =
     result.Length =! 7
 
 [<Property>]
-let ``MarkSixNumber.create returns error for integers out of range`` () =
-    Prop.forAll outOfRangeArb <| fun x -> 
-        test <@ match MarkSixNumber.create x with Error _ -> true | _ -> false @>
-
-[<Property>]
 let ``drawResultsArb returns six DrawnNumbers`` () =
     Prop.forAll drawResultsArb <| fun l ->
         let drawnNumbers, _ = List.partition (function DrawnNumber _ -> true | ExtraNumber _ -> false) l
@@ -79,13 +69,3 @@ let ``drawResultsArb returns one ExtraNumber`` () =
 [<Property>]
 let ``drawResultsArb returns six DrawnNumbers and one ExtraNumber`` () =
     ``drawResultsArb returns six DrawnNumbers`` .&. ``drawResultsArb returns one ExtraNumber``
-
-[<Property>]
-let ``MarkSixNumber's custom equality works`` () =
-    let markSixNumberArb = markSixNumberGen |> Arb.fromGen
-    Prop.forAll markSixNumberArb <| fun m -> 
-        m 
-        |> MarkSixNumber.value
-        |> MarkSixNumber.create
-        |> ValidationResult.extract
-        =! m
