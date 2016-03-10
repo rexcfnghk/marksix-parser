@@ -3,7 +3,6 @@
 open System
 open System.Collections.Generic
 open Models
-open Points
 open ValidationResult
 
 let drawNumbers () =
@@ -85,6 +84,20 @@ let checkResults errorHandler drawResults usersDraw =
         >=> splitDrawResults
         >=> validateOneExtraNumbersWithSixDrawnumbers
 
+    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
+        let points = 
+            (Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber)
+            ||> Set.intersect
+            |> Set.count
+            |> decimal
+
+        let extraPoints = 
+            match List.tryFind ((=) extraNumber) usersDraw with
+            | Some _ -> 0.5m
+            | None -> 0.m
+
+        points + extraPoints |> Points
+
     let drawResultsValidated, usersDrawValidated =
         drawResults |> validateDrawResults,
         usersDraw |> validateUsersDraw
@@ -99,15 +112,6 @@ let checkResults errorHandler drawResults usersDraw =
         let (ErrorMessage m1, ErrorMessage m2) = e1, e2
         m1 + m2 |> ErrorMessage |> Error
     | Success usersDraw, Success (extraNumber, drawResultWithoutExtraNumber) -> 
-        let points = 
-            (Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber)
-            ||> Set.intersect
-            |> Set.count
-            |> (decimal >> Points)
-
-        let extraPoints = 
-            match List.tryFind ((=) extraNumber) usersDraw with
-            | Some _ -> Points 0.5m
-            | None -> Points 0.m
-
-        points .+. extraPoints |> Prize.fromPoints |> ValidationResult.success
+        calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) 
+        |> Prize.fromPoints
+        |> ValidationResult.success
