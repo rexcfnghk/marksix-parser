@@ -14,9 +14,6 @@ let drawNumbers () =
         |> ValidationResult.extract ]
 
 let private addUniqueToList maxCount errorHandler getNumber =
-    //let createFromGetNumber = getNumber >> MarkSixNumber.create
-
-
     let addToHashSet (acc: HashSet<_>) input =
         if acc.Add input
         then input |> ValidationResult.success
