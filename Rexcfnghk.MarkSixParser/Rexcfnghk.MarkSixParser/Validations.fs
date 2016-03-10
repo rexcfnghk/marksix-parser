@@ -35,11 +35,11 @@ module ValidationResult =
 
     let (>=>) f g = f >> bind g
 
-    let validateFromList f = 
-        let rec validateFromListImpl acc = function
-            | [] -> Success acc
-            | h :: t ->
-                match f h with
-                | Success x -> validateFromListImpl (x :: acc) t
-                | Error e -> Error e
-        validateFromListImpl []
+    let apply fV xV = bind (fun f -> map f xV) fV
+
+    let (<*>) = apply
+
+    let validateFromList f list =
+        let cons h t = h :: t
+        let folder h t = cons <!> (f h) <*> t
+        List.foldBack folder list (Success [])
