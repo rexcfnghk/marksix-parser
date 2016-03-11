@@ -52,7 +52,9 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Properties.fs" />
+    <Compile Include="MarkSixProperties.fs" />
+    <Compile Include="MarkSixNumberProperties.fs" />
+    <Compile Include="PointsProperties.fs" />
     <Compile Include="Facts.fs" />
     <Content Include="packages.config" />
     <Content Include="App.config" />
