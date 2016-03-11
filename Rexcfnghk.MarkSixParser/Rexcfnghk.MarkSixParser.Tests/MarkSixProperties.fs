@@ -14,22 +14,18 @@ let markSixNumberGen =
 let usersDrawArb = 
     markSixNumberGen
     |> Gen.listOfLength 6
+    |> Gen.map Set.ofList
+    |> Gen.suchThat (fun s -> Set.count s >= 6)
+    |> Gen.map (Seq.take 6 >> Seq.toList)
     |> Arb.fromGen
 
 let drawResultsArb =
-    let drawnNumbersGen =
-        markSixNumberGen
-        |> Gen.map DrawnNumber
-        |> Gen.listOfLength 6
-
-    let extraNumberGen =
-        markSixNumberGen
-        |> Gen.map ExtraNumber
-        |> Gen.listOfLength 1
-
-    List.append <!> drawnNumbersGen <*> extraNumberGen
+    markSixNumberGen
+    |> Gen.listOfLength 7
+    |> Gen.map Set.ofList
+    |> Gen.suchThat (fun s -> Set.count s >= 7)
+    |> Gen.map (Seq.take 7 >> Seq.toList >> List.mapi (fun i -> if i = 6 then ExtraNumber else DrawnNumber))
     |> Arb.fromGen
-    
 
 [<Property>]
 let ``drawRandom always returns six elements`` () =
