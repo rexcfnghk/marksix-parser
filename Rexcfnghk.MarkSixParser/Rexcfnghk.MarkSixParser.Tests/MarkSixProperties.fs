@@ -1,4 +1,4 @@
-﻿module Rexcfnghk.MarkSixParser.Tests.Properties
+﻿module Rexcfnghk.MarkSixParser.Tests.MarkSixProperties
 
 open System
 open Rexcfnghk.MarkSixParser
@@ -11,20 +11,20 @@ let markSixNumberGen =
     Gen.elements [1..49]
     |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
 
-let usersDrawArb = 
+let markSixNumberListGen count =
     markSixNumberGen
-    |> Gen.listOfLength 6
+    |> Gen.listOfLength count
     |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s >= 6)
-    |> Gen.map (Seq.take 6 >> Seq.toList)
+    |> Gen.suchThat (fun s -> Set.count s >= count)
+    |> Gen.map (Seq.take count >> Seq.toList)
+
+let usersDrawArb = 
+    markSixNumberListGen 6
     |> Arb.fromGen
 
 let drawResultsArb =
-    markSixNumberGen
-    |> Gen.listOfLength 7
-    |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s >= 7)
-    |> Gen.map (Seq.take 7 >> Seq.toList >> List.mapi (fun i -> if i = 6 then ExtraNumber else DrawnNumber))
+    markSixNumberListGen 7
+    |> Gen.map (List.mapi (fun i -> if i = 6 then ExtraNumber else DrawnNumber))
     |> Arb.fromGen
 
 [<Property>]
