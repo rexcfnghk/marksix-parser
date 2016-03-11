@@ -20,7 +20,7 @@ let private addUniqueToList maxCount errorHandler getNumber =
 
     let createFromGetNumber hashSet = 
         let combinedValidation = getNumber >> MarkSixNumber.create >=> addToHashSet hashSet
-        ValidationResult.validateFromList combinedValidation
+        ValidationResult.traverse combinedValidation
 
     // FSharpSet requires comparison, which is not necessary in this case
     let rec addUniqueToListImpl (acc: HashSet<_>) =
@@ -110,7 +110,7 @@ let checkResults errorHandler drawResults usersDraw =
         errorHandler e1
         errorHandler e2
         let (ErrorMessage m1, ErrorMessage m2) = e1, e2
-        m1 + m2 |> ErrorMessage |> Error
+        m1 + m2 |> ValidationResult.errorFromString
     | Success usersDraw, Success (extraNumber, drawResultWithoutExtraNumber) -> 
         calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) 
         |> Prize.fromPoints

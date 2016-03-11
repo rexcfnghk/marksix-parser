@@ -39,7 +39,8 @@ module ValidationResult =
 
     let (<*>) = apply
 
-    let validateFromList f list =
+    // http://fsharpforfunandprofit.com/posts/elevated-world-4/#traverse
+    let traverse f list =
         let cons h t = h :: t
         let folder h t = cons <!> (f h) <*> t
         List.foldBack folder list (Success [])
