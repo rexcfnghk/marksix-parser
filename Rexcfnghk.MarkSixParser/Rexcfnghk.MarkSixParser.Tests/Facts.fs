@@ -6,22 +6,23 @@ open Swensen.Unquote
 open Xunit
 
 [<Fact>]
-let ``checkResults returns error when drawResults's length is not seven`` () =
-    let drawResults = []
-    let usersDraw = [1..6] |> List.map (MarkSixNumber.create >> ValidationResult.extract)
-
-    let validationResult = MarkSix.checkResults ignore drawResults usersDraw
-
-    let error = match validationResult with
-                | Error _ -> true
-                | _ -> false
-
-    test <@ error @>
-
-[<Fact>]
 let ``checkResults returns error when drawResult contains duplicate`` () =
-    let drawResults = 1 |> (List.replicate 7 >> List.mapi (fun i -> MarkSixNumber.create >> ValidationResult.extract >> if i = 6 then ExtraNumber else DrawnNumber))
-    let usersDraw = [1..6] |> List.map (MarkSixNumber.create >> ValidationResult.extract)
+    let drawResults = 
+        1 
+        |> (List.replicate 7 >> List.map (MarkSixNumber.create >> ValidationResult.extract))
+        |> function
+            | [d1; d2; d3; d4; d5; d6; e] ->
+                (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
+                 DrawnNumber d4, DrawnNumber d5, DrawnNumber d6, ExtraNumber e)
+                |> DrawResults
+            | _ -> failwith "Not expected to be here"
+    let usersDraw = 
+        [1..6]
+        |> List.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> function
+            | [m1; m2; m3; m4; m5; m6] ->
+                UsersDraw (m1, m2, m3, m4, m5, m6)
+            | _ -> failwith "Not expected to be here"
 
     let validationResult = MarkSix.checkResults ignore drawResults usersDraw
 

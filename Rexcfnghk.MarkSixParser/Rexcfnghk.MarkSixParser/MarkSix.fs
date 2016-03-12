@@ -5,12 +5,16 @@ open System.Collections.Generic
 open Models
 open ValidationResult
 
-let drawNumbers () =
+let randomUsersDraw () =
     let r = Random()
-    [ for _ in 1..6 -> 
-        r.Next(1, 50) 
-        |> MarkSixNumber.create
-        |> ValidationResult.extract ]
+    let l = [ for _ in 1..6 -> 
+                r.Next(1, 50) 
+                |> MarkSixNumber.create
+                |> ValidationResult.extract ]
+    match l with
+    | [m1; m2; m3; m4; m5; m6] ->
+        UsersDraw (m1, m2, m3, m4, m5, m6)
+    | _ -> invalidOp "Internal error"
 
 let private addUniqueToList maxCount errorHandler getNumber =
     let addToHashSet (acc: HashSet<_>) input =
@@ -42,11 +46,19 @@ let MaxDrawResultCount = 7
 let MaxUsersDrawCount = 6
 
 let getDrawResultNumbers errorHandler getNumber =
-    addUniqueToList MaxDrawResultCount errorHandler getNumber 
-    |> List.mapi (fun i -> if i = 6 then ExtraNumber else DrawnNumber)
+    match addUniqueToList MaxDrawResultCount errorHandler getNumber with
+    | [d1; d2; d3; d4; d5; d6; e] -> 
+        (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
+         DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
+         ExtraNumber e)
+        |> DrawResults
+    | _ -> invalidOp "Internal error"
 
-let getUsersDrawNumber =
-    addUniqueToList MaxUsersDrawCount
+let getUsersDrawNumber errorHandler getNumber =
+    match addUniqueToList MaxUsersDrawCount errorHandler getNumber with
+    | [m1; m2; m3; m4; m5; m6] ->
+        UsersDraw (m1, m2, m3, m4, m5, m6)
+    | _ -> invalidOp "Internal error"
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique (drawResults: _ list) =
@@ -54,35 +66,6 @@ let checkResults errorHandler drawResults usersDraw =
         if set.Count = drawResults.Length
         then Success drawResults
         else "There are duplicates in draw result list" |> ValidationResult.errorFromString
-
-    let validateUsersDraw =
-        let validateUsersDrawLength input = 
-            if List.length input = 6
-            then Success input
-            else 
-                "MarkSixNumber list has incorrect length"
-                |> ValidationResult.errorFromString
-
-        allElementsAreUnique
-        >=> validateUsersDrawLength
-
-    let validateDrawResults =
-        let splitDrawResults drawResults =
-            match List.rev drawResults with
-            | h :: t -> ValidationResult.success (h, t)
-            | [] -> "Draw result list is empty" |> ValidationResult.errorFromString
-
-        let validateOneExtraNumbersWithSixDrawnumbers (extraNumber, drawnNumbers) =
-            let drawnNumbersAreAllDrawnNumbers = List.choose (function DrawnNumber x -> Some x | _ -> None) drawnNumbers
-            let extraNumberIsExtraNumber, extraNumber = (function ExtraNumber x -> true, x | DrawnNumber y -> false, y) extraNumber
-
-            if List.length drawnNumbersAreAllDrawnNumbers = 6 && extraNumberIsExtraNumber
-            then Success (extraNumber, drawnNumbersAreAllDrawnNumbers)
-            else "There should be exactly six drawn numbers and one extra number" |> ValidationResult.errorFromString
-
-        allElementsAreUnique
-        >=> splitDrawResults
-        >=> validateOneExtraNumbersWithSixDrawnumbers
 
     let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
         let points = 
@@ -98,9 +81,27 @@ let checkResults errorHandler drawResults usersDraw =
 
         points + extraPoints |> Points
 
+    let extractedDrawResults =
+        let (DrawResults (
+                DrawnNumber n1, DrawnNumber n2, DrawnNumber n3, 
+                DrawnNumber n4, DrawnNumber n5, DrawnNumber n6, 
+                ExtraNumber e)) = drawResults
+        [n1; n2; n3; n4; n5; n6; e]
+
+    let extractedUsersDraw =
+        let (UsersDraw (n1, n2, n3, n4, n5, n6)) = usersDraw
+        [n1; n2; n3; n4; n5; n6]
+
+    let splitDrawResults drawResults =
+        match List.rev drawResults with
+        | h :: t -> Success (t, h)
+        | _ -> 
+            "drawResults not in expected format" 
+            |> ValidationResult.errorFromString
+
     let drawResultsValidated, usersDrawValidated =
-        drawResults |> validateDrawResults,
-        usersDraw |> validateUsersDraw
+        extractedDrawResults |> (allElementsAreUnique >=> splitDrawResults),
+        extractedUsersDraw |> allElementsAreUnique
 
     match usersDrawValidated, drawResultsValidated with
     | Error e, Success _ | Success _, Error e -> 
@@ -111,7 +112,7 @@ let checkResults errorHandler drawResults usersDraw =
         errorHandler e2
         let (ErrorMessage m1, ErrorMessage m2) = e1, e2
         m1 + m2 |> ValidationResult.errorFromString
-    | Success usersDraw, Success (extraNumber, drawResultWithoutExtraNumber) -> 
-        calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) 
+    | Success usersDraw, Success drawResults -> 
+        calculatePoints usersDraw drawResults 
         |> Prize.fromPoints
         |> ValidationResult.success

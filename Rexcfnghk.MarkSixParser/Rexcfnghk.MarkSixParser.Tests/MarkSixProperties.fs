@@ -1,6 +1,5 @@
 ﻿module Rexcfnghk.MarkSixParser.Tests.MarkSixProperties
 
-open System
 open Rexcfnghk.MarkSixParser
 open Models
 open FsCheck
@@ -20,47 +19,33 @@ let markSixNumberListGen count =
 
 let usersDrawArb = 
     markSixNumberListGen 6
+    |> Gen.map (function
+        | [m1; m2; m3; m4; m5; m6] ->
+            UsersDraw (m1, m2, m3, m4, m5, m6)
+        | _ -> failwith "Not expected to be here")
     |> Arb.fromGen
 
 let drawResultsArb =
     markSixNumberListGen 7
-    |> Gen.map (List.mapi (fun i -> if i = 6 then ExtraNumber else DrawnNumber))
+    |> Gen.map (function
+        | [d1; d2; d3; d4; d5; d6; e] ->
+            (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
+             DrawnNumber d4, DrawnNumber d5, DrawnNumber d6, ExtraNumber e)
+            |> DrawResults
+        | _ -> failwith "Not expected to be here")
     |> Arb.fromGen
-
-[<Property>]
-let ``drawRandom always returns six elements`` () =
-    let numbers = MarkSix.drawNumbers ()
-    numbers.Length =! 6
 
 [<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
-    let numbers = MarkSix.drawNumbers ()
+    let (UsersDraw (m1, m2, m3, m4, m5, m6)) = MarkSix.randomUsersDraw ()
+    let numbers = [m1; m2; m3; m4; m5; m6]
     test <@ List.forall (MarkSixNumber.value >> isWithinRange) numbers @>
-
-[<Property>]
-let ``getDrawResultNumbers always add ExtraNumber at the end`` () =
-    let r = Random()
-    let resultListRev = List.rev <| MarkSix.getDrawResultNumbers ignore (fun () -> r.Next(1, 50))
-    test <@ match resultListRev with (ExtraNumber _) :: _ -> true | _ -> false @>
-
-[<Property>]
-let ``getDrawResultNumbers always returns seven elements`` () =
-    let r = Random()
-    let result = MarkSix.getDrawResultNumbers ignore (fun () -> r.Next(1, 50))
-    result.Length =! 7
-
-[<Property>]
-let ``drawResultsArb returns six DrawnNumbers and one ExtraNumber`` () =
-    Prop.forAll drawResultsArb <| fun l ->
-        let drawnNumbers, extraNumbers = List.partition (function DrawnNumber _ -> true | ExtraNumber _ -> false) l
-        test <@ List.length drawnNumbers = 6 && List.length extraNumbers = 1 @>
 
 [<Property>]
 let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw`` () =
     let splitDrawResults drawResults =
-        let splitter = List.map (function DrawnNumber n | ExtraNumber n -> n) >> List.rev
-        match splitter drawResults with
+        match List.rev drawResults with
         | [] -> failwith "Should not reach here"
         | h :: t -> t, h
 
@@ -80,8 +65,19 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
     
     Prop.forAll drawResultsArb <| fun drawResults ->
         Prop.forAll usersDrawArb <| fun usersDraw ->
+            let extractedDrawResults =
+                let (DrawResults (
+                        DrawnNumber n1, DrawnNumber n2, DrawnNumber n3, 
+                        DrawnNumber n4, DrawnNumber n5, DrawnNumber n6, 
+                        ExtraNumber e)) = drawResults
+                [n1; n2; n3; n4; n5; n6; e]
+
+            let extractedUsersDraw =
+                let (UsersDraw (n1, n2, n3, n4, n5, n6)) = usersDraw
+                [n1; n2; n3; n4; n5; n6]
+
             let expected = 
-                calculatePoints usersDraw (splitDrawResults drawResults)
+                calculatePoints extractedUsersDraw (splitDrawResults extractedDrawResults)
                 |> Prize.fromPoints
  
             let actual =
