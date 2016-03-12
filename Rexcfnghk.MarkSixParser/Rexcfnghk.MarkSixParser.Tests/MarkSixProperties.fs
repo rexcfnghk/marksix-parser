@@ -48,7 +48,8 @@ let ``drawRandom always returns numbers between 1 and 49`` () =
 
 [<Property>]
 let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw`` () =
-    let splitDrawResults = function
+    let splitDrawResults drawResults =
+        match List.rev drawResults with
         | [] -> failwith "Should not reach here"
         | h :: t -> t, h
 
