@@ -17,27 +17,32 @@ let randomUsersDraw () =
     | _ -> invalidOp "Internal error"
 
 let private addUniqueToList maxCount errorHandler getNumber =
-    let addToHashSet (acc: HashSet<_>) input =
-        if acc.Add input
-        then input |> ValidationResult.success
-        else "Adding duplicate elements" |> ValidationResult.errorFromString
+    let addToSet acc input =
+        if Set.contains input acc
+        then "Adding duplicate elements" |> ValidationResult.errorFromString
+        else Set.add input acc |> Success
 
-    let createFromGetNumber hashSet = 
-        let combinedValidation = getNumber >> MarkSixNumber.create >=> addToHashSet hashSet
-        ValidationResult.traverse combinedValidation
+    let createFromGetNumber set = 
+        getNumber >> MarkSixNumber.create >=> addToSet set
 
-    // FSharpSet requires comparison, which is not necessary in this case
-    let rec addUniqueToListImpl (acc: HashSet<_>) =
-        let count = acc.Count
-        if count = maxCount
-        then acc |> Seq.toList
+    let rec retryableErrorHandler set errorMessage =
+        errorHandler errorMessage
+        match createFromGetNumber set () with
+        | Success s -> s
+        | Error e -> retryableErrorHandler set e
+
+    let rec addUniqueToListImpl acc =
+        if Set.count acc = maxCount
+        then acc |> Set.toList
         else
-            createFromGetNumber acc [()]
-            |> ValidationResult.doubleMap ignore errorHandler
+            let updated =
+                createFromGetNumber acc ()
+                |> ValidationResult.doubleMap id (retryableErrorHandler acc)
 
-            addUniqueToListImpl acc
+            addUniqueToListImpl updated
 
-    addUniqueToListImpl <| HashSet()
+    addUniqueToListImpl Set.empty
+
 
 [<Literal>]
 let MaxDrawResultCount = 7
