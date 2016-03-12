@@ -1,7 +1,6 @@
 ﻿module Rexcfnghk.MarkSixParser.MarkSix
 
 open System
-open System.Collections.Generic
 open Models
 open ValidationResult
 
@@ -66,9 +65,9 @@ let getUsersDrawNumber errorHandler getNumber =
     | _ -> invalidOp "Internal error"
 
 let checkResults errorHandler drawResults usersDraw =
-    let allElementsAreUnique (drawResults: _ list) =
-        let set = HashSet(drawResults)
-        if set.Count = drawResults.Length
+    let allElementsAreUnique drawResults =
+        let set = Set.ofList drawResults
+        if Set.count set = List.length drawResults
         then Success drawResults
         else "There are duplicates in draw result list" |> ValidationResult.errorFromString
 
