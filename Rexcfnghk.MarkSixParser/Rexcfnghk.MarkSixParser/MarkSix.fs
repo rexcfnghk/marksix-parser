@@ -5,12 +5,16 @@ open System.Collections.Generic
 open Models
 open ValidationResult
 
-let drawNumbers () =
+let randomUsersDraw () =
     let r = Random()
-    [ for _ in 1..6 -> 
-        r.Next(1, 50) 
-        |> MarkSixNumber.create
-        |> ValidationResult.extract ]
+    let l = [ for _ in 1..6 -> 
+                r.Next(1, 50) 
+                |> MarkSixNumber.create
+                |> ValidationResult.extract ]
+    match l with
+    | [m1; m2; m3; m4; m5; m6] ->
+        UsersDraw (m1, m2, m3, m4, m5, m6)
+    | _ -> invalidOp "Internal error"
 
 let private addUniqueToList maxCount errorHandler getNumber =
     let addToHashSet (acc: HashSet<_>) input =

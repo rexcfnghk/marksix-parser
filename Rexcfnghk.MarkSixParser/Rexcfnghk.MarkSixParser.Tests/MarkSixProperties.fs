@@ -36,14 +36,10 @@ let drawResultsArb =
     |> Arb.fromGen
 
 [<Property>]
-let ``drawRandom always returns six elements`` () =
-    let numbers = MarkSix.drawNumbers ()
-    numbers.Length =! 6
-
-[<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
-    let numbers = MarkSix.drawNumbers ()
+    let (UsersDraw (m1, m2, m3, m4, m5, m6)) = MarkSix.randomUsersDraw ()
+    let numbers = [m1; m2; m3; m4; m5; m6]
     test <@ List.forall (MarkSixNumber.value >> isWithinRange) numbers @>
 
 [<Property>]
