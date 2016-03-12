@@ -1,13 +1,13 @@
 ﻿module Rexcfnghk.MarkSixParser.Models
 
-[<StructuredFormatDisplay("{AsString}")>]
-type DrawResultElement =
-    | DrawnNumber of MarkSixNumber.T
-    | ExtraNumber of MarkSixNumber.T
-    override this.ToString() =
-        match this with
-        | DrawnNumber n -> sprintf "DrawnNumber %A" n
-        | ExtraNumber n -> sprintf "ExtraNumber %A" n
-    member this.AsString = this.ToString()
+type DrawnNumber = DrawnNumber of MarkSixNumber.T
+
+type ExtraNumber = ExtraNumber of MarkSixNumber.T
 
 type Points = Points of decimal
+
+type DrawResults = DrawResults of DrawnNumber * DrawnNumber * DrawnNumber * 
+                                       DrawnNumber * DrawnNumber * DrawnNumber * ExtraNumber
+
+type UsersDraw = UsersDraw of MarkSixNumber.T * MarkSixNumber.T * MarkSixNumber.T * 
+                             MarkSixNumber.T * MarkSixNumber.T * MarkSixNumber.T
