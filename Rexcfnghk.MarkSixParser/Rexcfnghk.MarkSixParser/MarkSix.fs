@@ -39,24 +39,21 @@ let private addUniqueToList maxCount errorHandler getNumber =
     let createFromGetNumber set = 
         getNumber >> MarkSixNumber.create >=> addToSet set
 
-    let rec retryableErrorHandler set errorMessage =
-        errorHandler errorMessage
+    let rec retryableErrorHandler set =
         match createFromGetNumber set () with
         | Success s -> s
-        | Error e -> retryableErrorHandler set e
+        | Error e -> 
+            errorHandler e
+            retryableErrorHandler set
 
     let rec addUniqueToListImpl acc =
         if Set.count acc = maxCount
         then acc |> Set.toList
         else
-            let updated =
-                createFromGetNumber acc ()
-                |> ValidationResult.doubleMap id (retryableErrorHandler acc)
-
+            let updated = retryableErrorHandler acc
             addUniqueToListImpl updated
 
     addUniqueToListImpl Set.empty
-
 
 [<Literal>]
 let MaxDrawResultCount = 7
