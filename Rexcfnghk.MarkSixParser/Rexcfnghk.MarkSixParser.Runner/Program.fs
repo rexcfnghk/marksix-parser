@@ -9,12 +9,10 @@ let main _ =
     let drawResults = getDrawResultNumbers' ()
     printfn "The draw results are %A%s" drawResults Environment.NewLine
 
-    printfn "Enter user's draw"
-    let usersDraw = getUsersDrawNumbers' ()
-    printfn "User's draw is %A%s" usersDraw Environment.NewLine
+    let usersDrawList = getMultipleUsersDraw ()
 
-    let prize = checkResults' drawResults usersDraw
-    printfn "Your prize is %A"  prize
+    let prizes = checkMultipleResults drawResults usersDrawList
+    printPrizes prizes
 
     Console.ReadLine() |> ignore
     0 // return an integer exit code
