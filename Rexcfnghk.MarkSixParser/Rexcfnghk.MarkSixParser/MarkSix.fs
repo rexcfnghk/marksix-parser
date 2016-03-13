@@ -1,9 +1,26 @@
 ﻿module Rexcfnghk.MarkSixParser.MarkSix
 
 open System
-open System.Collections.Generic
 open Models
 open ValidationResult
+
+let toUsersDraw = function
+    | [m1; m2; m3; m4; m5; m6] ->
+        UsersDraw (m1, m2, m3, m4, m5, m6)
+        |> Success
+    | _ -> 
+        "Users draw expects a list of six MarkSixNumbers"
+        |> ValidationResult.errorFromString
+
+let toDrawResults = function
+    | [d1; d2; d3; d4; d5; d6; e] -> 
+        (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
+         DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
+         ExtraNumber e)
+        |> (DrawResults >> Success)
+    | _ ->
+        "drawResults expects a list of six MarkSixNumbers and one ExtraNumber"
+        |> ValidationResult.errorFromString
 
 let randomUsersDraw () =
     let r = Random()
@@ -11,33 +28,35 @@ let randomUsersDraw () =
                 r.Next(1, 50) 
                 |> MarkSixNumber.create
                 |> ValidationResult.extract ]
-    match l with
-    | [m1; m2; m3; m4; m5; m6] ->
-        UsersDraw (m1, m2, m3, m4, m5, m6)
-    | _ -> invalidOp "Internal error"
+    l |> toUsersDraw |> ValidationResult.extract
 
 let private addUniqueToList maxCount errorHandler getNumber =
-    let addToHashSet (acc: HashSet<_>) input =
-        if acc.Add input
-        then input |> ValidationResult.success
-        else "Adding duplicate elements" |> ValidationResult.errorFromString
+    let addToSet acc input =
+        if Set.contains input acc
+        then "Adding duplicate elements" |> ValidationResult.errorFromString
+        else Set.add input acc |> Success
 
-    let createFromGetNumber hashSet = 
-        let combinedValidation = getNumber >> MarkSixNumber.create >=> addToHashSet hashSet
-        ValidationResult.traverse combinedValidation
+    let createFromGetNumber set = 
+        getNumber >> MarkSixNumber.create >=> addToSet set
 
-    // FSharpSet requires comparison, which is not necessary in this case
-    let rec addUniqueToListImpl (acc: HashSet<_>) =
-        let count = acc.Count
-        if count = maxCount
-        then acc |> Seq.toList
+    let rec retryableErrorHandler set errorMessage =
+        errorHandler errorMessage
+        match createFromGetNumber set () with
+        | Success s -> s
+        | Error e -> retryableErrorHandler set e
+
+    let rec addUniqueToListImpl acc =
+        if Set.count acc = maxCount
+        then acc |> Set.toList
         else
-            createFromGetNumber acc [()]
-            |> ValidationResult.doubleMap ignore errorHandler
+            let updated =
+                createFromGetNumber acc ()
+                |> ValidationResult.doubleMap id (retryableErrorHandler acc)
 
-            addUniqueToListImpl acc
+            addUniqueToListImpl updated
 
-    addUniqueToListImpl <| HashSet()
+    addUniqueToListImpl Set.empty
+
 
 [<Literal>]
 let MaxDrawResultCount = 7
@@ -46,24 +65,19 @@ let MaxDrawResultCount = 7
 let MaxUsersDrawCount = 6
 
 let getDrawResultNumbers errorHandler getNumber =
-    match addUniqueToList MaxDrawResultCount errorHandler getNumber with
-    | [d1; d2; d3; d4; d5; d6; e] -> 
-        (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
-         DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
-         ExtraNumber e)
-        |> DrawResults
-    | _ -> invalidOp "Internal error"
+    addUniqueToList MaxDrawResultCount errorHandler getNumber
+    |> toDrawResults
+    |> ValidationResult.extract
 
 let getUsersDrawNumber errorHandler getNumber =
-    match addUniqueToList MaxUsersDrawCount errorHandler getNumber with
-    | [m1; m2; m3; m4; m5; m6] ->
-        UsersDraw (m1, m2, m3, m4, m5, m6)
-    | _ -> invalidOp "Internal error"
+    addUniqueToList MaxUsersDrawCount errorHandler getNumber
+    |> toUsersDraw
+    |> ValidationResult.extract
 
 let checkResults errorHandler drawResults usersDraw =
-    let allElementsAreUnique (drawResults: _ list) =
-        let set = HashSet(drawResults)
-        if set.Count = drawResults.Length
+    let allElementsAreUnique drawResults =
+        let set = Set.ofList drawResults
+        if Set.count set = List.length drawResults
         then Success drawResults
         else "There are duplicates in draw result list" |> ValidationResult.errorFromString
 
