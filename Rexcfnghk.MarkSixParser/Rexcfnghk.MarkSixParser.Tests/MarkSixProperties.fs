@@ -19,20 +19,12 @@ let markSixNumberListGen count =
 
 let usersDrawArb = 
     markSixNumberListGen 6
-    |> Gen.map (function
-        | [m1; m2; m3; m4; m5; m6] ->
-            UsersDraw (m1, m2, m3, m4, m5, m6)
-        | _ -> failwith "Not expected to be here")
+    |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
     |> Arb.fromGen
 
 let drawResultsArb =
     markSixNumberListGen 7
-    |> Gen.map (function
-        | [d1; d2; d3; d4; d5; d6; e] ->
-            (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
-             DrawnNumber d4, DrawnNumber d5, DrawnNumber d6, ExtraNumber e)
-            |> DrawResults
-        | _ -> failwith "Not expected to be here")
+    |> Gen.map (MarkSix.toDrawResults >> ValidationResult.extract)
     |> Arb.fromGen
 
 [<Property>]

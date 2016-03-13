@@ -4,16 +4,31 @@ open System
 open Models
 open ValidationResult
 
+let toUsersDraw = function
+    | [m1; m2; m3; m4; m5; m6] ->
+        UsersDraw (m1, m2, m3, m4, m5, m6)
+        |> Success
+    | _ -> 
+        "Users draw expects a list of six MarkSixNumbers"
+        |> ValidationResult.errorFromString
+
+let toDrawResults = function
+    | [d1; d2; d3; d4; d5; d6; e] -> 
+        (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
+         DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
+         ExtraNumber e)
+        |> (DrawResults >> Success)
+    | _ ->
+        "drawResults expects a list of six MarkSixNumbers and one ExtraNumber"
+        |> ValidationResult.errorFromString
+
 let randomUsersDraw () =
     let r = Random()
     let l = [ for _ in 1..6 -> 
                 r.Next(1, 50) 
                 |> MarkSixNumber.create
                 |> ValidationResult.extract ]
-    match l with
-    | [m1; m2; m3; m4; m5; m6] ->
-        UsersDraw (m1, m2, m3, m4, m5, m6)
-    | _ -> invalidOp "Internal error"
+    l |> toUsersDraw |> ValidationResult.extract
 
 let private addUniqueToList maxCount errorHandler getNumber =
     let addToSet acc input =
@@ -50,19 +65,14 @@ let MaxDrawResultCount = 7
 let MaxUsersDrawCount = 6
 
 let getDrawResultNumbers errorHandler getNumber =
-    match addUniqueToList MaxDrawResultCount errorHandler getNumber with
-    | [d1; d2; d3; d4; d5; d6; e] -> 
-        (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
-         DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
-         ExtraNumber e)
-        |> DrawResults
-    | _ -> invalidOp "Internal error"
+    addUniqueToList MaxDrawResultCount errorHandler getNumber
+    |> toDrawResults
+    |> ValidationResult.extract
 
 let getUsersDrawNumber errorHandler getNumber =
-    match addUniqueToList MaxUsersDrawCount errorHandler getNumber with
-    | [m1; m2; m3; m4; m5; m6] ->
-        UsersDraw (m1, m2, m3, m4, m5, m6)
-    | _ -> invalidOp "Internal error"
+    addUniqueToList MaxUsersDrawCount errorHandler getNumber
+    |> toUsersDraw
+    |> ValidationResult.extract
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique drawResults =
