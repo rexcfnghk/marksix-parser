@@ -14,7 +14,7 @@ let ``Points addition has identity`` d1 =
     p1 .+. p2 =! p1
 
 [<Property>]
-let ``Poitns addition is communicative`` () =
+let ``Points addition is communicative`` () =
     let pointsArb = 
         Gen.elements [1.m .. 6.m]
         |> Gen.map Points
@@ -24,7 +24,7 @@ let ``Poitns addition is communicative`` () =
             p1 .+. p2 =! p2 .+. p1
 
 [<Property>]
-let ``Poitns addition is associative`` () =
+let ``Points addition is associative`` () =
     let pointsArb = 
         Gen.elements [1.m .. 6.m]
         |> Gen.map Points
