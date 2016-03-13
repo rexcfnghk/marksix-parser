@@ -34,7 +34,7 @@ let ``drawRandom always returns numbers between 1 and 49`` () =
     let numbers = [m1; m2; m3; m4; m5; m6]
     test <@ List.forall (MarkSixNumber.value >> isWithinRange) numbers @>
 
-[<Property>]
+[<Property(MaxTest = 500)>]
 let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw`` () =
     let splitDrawResults drawResults =
         match List.rev drawResults with
