@@ -2,6 +2,7 @@
 
 open Rexcfnghk.MarkSixParser
 open Rexcfnghk.MarkSixParser.Models
+open Rexcfnghk.MarkSixParser.Prize
 open Swensen.Unquote
 open Xunit
 
@@ -32,3 +33,32 @@ let ``checkResults returns error when drawResult contains duplicate`` () =
 
     test <@ error @>
 
+[<Fact>]
+let ``checkResults returns correct prize for sample usersDraw and drawResults`` () =
+    let drawResults = 
+        [11; 16; 19; 21; 30; 33; 31]
+        |> List.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> (MarkSix.toDrawResults >> ValidationResult.extract)
+
+    let usersDraw = 
+        [3; 4; 24; 28; 30; 32]
+        |> List.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> (MarkSix.toUsersDraw >> ValidationResult.extract)
+
+    let result = MarkSix.checkResults ignore drawResults usersDraw |> ValidationResult.extract
+    result =! NoPrize
+
+[<Fact>]
+let ``checkResults returns correct prize for sample usersDraw and drawResults 2`` () =
+    let drawResults = 
+        [11; 16; 19; 21; 30; 33; 31]
+        |> List.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> (MarkSix.toDrawResults >> ValidationResult.extract)
+
+    let usersDraw = 
+        [11; 14; 19; 31; 38; 39]
+        |> List.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> (MarkSix.toUsersDraw >> ValidationResult.extract)
+        
+    let result = MarkSix.checkResults ignore drawResults usersDraw |> ValidationResult.extract
+    result =! NoPrize

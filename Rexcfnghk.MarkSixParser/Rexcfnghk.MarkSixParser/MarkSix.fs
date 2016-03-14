@@ -55,19 +55,15 @@ let private addUniqueToList maxCount errorHandler getNumber =
 
     addUniqueToListImpl Set.empty
 
-[<Literal>]
-let MaxDrawResultCount = 7
-
-[<Literal>]
-let MaxUsersDrawCount = 6
-
 let getDrawResultNumbers errorHandler getNumber =
-    addUniqueToList MaxDrawResultCount errorHandler getNumber
+    let maxDrawResultCount = 7
+    addUniqueToList maxDrawResultCount errorHandler getNumber
     |> toDrawResults
     |> ValidationResult.extract
 
 let getUsersDrawNumber errorHandler getNumber =
-    addUniqueToList MaxUsersDrawCount errorHandler getNumber
+    let maxUsersDrawCount = 6
+    addUniqueToList maxUsersDrawCount errorHandler getNumber
     |> toUsersDraw
     |> ValidationResult.extract
 
@@ -75,18 +71,21 @@ let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique list =
         let set = Set.ofList list
         if Set.count set = List.length list
-        then Success set
+        then Success list
         else "There are duplicates in draw result list" |> ValidationResult.errorFromString
 
     let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
+        let usersDrawSet, drawResultWithoutExtraNumberSet =
+            Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber
+        
         let points = 
-            (usersDraw, drawResultWithoutExtraNumber)
+            (usersDrawSet, drawResultWithoutExtraNumberSet)
             ||> Set.intersect
             |> Set.count
             |> decimal
 
         let extraPoints = 
-            if Set.contains extraNumber usersDraw
+            if Set.contains extraNumber usersDrawSet
             then 0.5m 
             else 0.m
 
