@@ -75,18 +75,21 @@ let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique list =
         let set = Set.ofList list
         if Set.count set = List.length list
-        then Success set
+        then Success list
         else "There are duplicates in draw result list" |> ValidationResult.errorFromString
 
     let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
+        let usersDrawSet, drawResultWithoutExtraNumberSet =
+            Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber
+        
         let points = 
-            (usersDraw, drawResultWithoutExtraNumber)
+            (usersDrawSet, drawResultWithoutExtraNumberSet)
             ||> Set.intersect
             |> Set.count
             |> decimal
 
         let extraPoints = 
-            if Set.contains extraNumber usersDraw
+            if Set.contains extraNumber usersDrawSet
             then 0.5m 
             else 0.m
 
