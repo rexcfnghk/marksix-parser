@@ -55,19 +55,15 @@ let private addUniqueToList maxCount errorHandler getNumber =
 
     addUniqueToListImpl Set.empty
 
-[<Literal>]
-let MaxDrawResultCount = 7
-
-[<Literal>]
-let MaxUsersDrawCount = 6
-
 let getDrawResultNumbers errorHandler getNumber =
-    addUniqueToList MaxDrawResultCount errorHandler getNumber
+    let maxDrawResultCount = 7
+    addUniqueToList maxDrawResultCount errorHandler getNumber
     |> toDrawResults
     |> ValidationResult.extract
 
 let getUsersDrawNumber errorHandler getNumber =
-    addUniqueToList MaxUsersDrawCount errorHandler getNumber
+    let maxUsersDrawCount = 6
+    addUniqueToList maxUsersDrawCount errorHandler getNumber
     |> toUsersDraw
     |> ValidationResult.extract
 
