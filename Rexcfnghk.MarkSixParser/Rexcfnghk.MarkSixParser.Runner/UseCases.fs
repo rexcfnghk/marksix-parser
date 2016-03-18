@@ -16,7 +16,7 @@ let tryGetInteger () =
             errorHandler e
             retryableErrorHandler getResult errorHandler
 
-    let getInt32 = Console.ReadLine >> validateInt32
+    let getInt32 = stdin.ReadLine >> validateInt32
 
     retryableErrorHandler getInt32 (printfn "%A")
 
@@ -30,7 +30,7 @@ let getMultipleUsersDraw () =
             printfn "Enter user's #%i draw" (i + 1)
             let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") tryGetInteger
             printfn "Continue entering user's draw #%i [YyNn]?" (i + 2)
-            let decision = Console.ReadLine()
+            let decision = stdin.ReadLine()
             getUsersDrawNumbers' decision (usersDraw :: acc) (i + 1)
 
     let printUsersDrawList list =

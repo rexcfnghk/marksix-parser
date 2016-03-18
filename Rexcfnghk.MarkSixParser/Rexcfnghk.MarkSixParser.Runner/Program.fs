@@ -14,5 +14,5 @@ let main _ =
     let prizes = checkMultipleResults drawResults usersDrawList
     printPrizes prizes
 
-    Console.ReadLine() |> ignore
+    stdin.ReadLine() |> ignore
     0 // return an integer exit code
