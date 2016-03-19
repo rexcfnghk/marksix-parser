@@ -3,8 +3,8 @@
 type ErrorMessage = ErrorMessage of string
 
 [<StructuredFormatDisplay("{AsString}")>]
-type ValidationResult<'T> =
-    | Success of 'T
+type ValidationResult<'a> =
+    | Success of 'a
     | Error of ErrorMessage
     override this.ToString() =
         match this with
@@ -17,7 +17,7 @@ module ValidationResult =
 
     let error = Error
 
-    let errorFromString<'T> : string -> ValidationResult<'T> = ErrorMessage >> Error
+    let errorFromString<'a> : string -> ValidationResult<'a> = ErrorMessage >> Error
 
     let doubleMap successHandler errorHandler = function
         | Success x -> successHandler x
@@ -31,11 +31,14 @@ module ValidationResult =
 
     let (>>=) x f = bind f x
 
-    let extract<'T> : ValidationResult<'T> -> 'T = doubleMap id (fun (ErrorMessage e) -> invalidOp e)
+    let extract<'a> : ValidationResult<'a> -> 'a = doubleMap id (fun (ErrorMessage e) -> invalidOp e)
 
     let (>=>) f g = f >> bind g
 
-    let apply fV xV = bind (fun f -> map f xV) fV
+    let apply fV xV =
+        match fV, xV with
+        | Success f, Success x -> Success (f x)
+        | Error e, _ | _, Error e -> Error e
 
     let (<*>) = apply
 
