@@ -33,16 +33,20 @@ let getMultipleUsersDraw () =
             let decision = stdin.ReadLine()
             getUsersDrawNumbers' decision (usersDraw :: acc) (i + 1)
 
-    let printUsersDrawList list =
-        printfn "You entered %i user's draw(s)" (List.length list)
-        List.iter (printfn "%A") list
+    let printUsersDrawList =
+        let rec printUsersDrawListImpl acc = function
+            | [] -> printfn "You entered %i user's draw(s)" acc
+            | h :: t -> 
+                printfn "User's draw #%i: %A" acc h
+                printUsersDrawListImpl (acc + 1) t
+        printUsersDrawListImpl 0
 
     let usersDrawList = getUsersDrawNumbers' "Y" [] 0
     printUsersDrawList usersDrawList
     usersDrawList
 
-let checkMultipleResults drawResults usersDrawList =
-    List.map (MarkSix.checkResults (printfn "%A") drawResults) usersDrawList
+let checkMultipleResults drawResults =
+    List.map (MarkSix.checkResults (printfn "%A") drawResults)
 
-let printPrizes prizes = 
-    List.iteri (printfn "Your prize for draw #%i is %A") prizes
+let printPrizes<'a> : 'a list -> unit = 
+    List.iteri (printfn "Your prize for draw #%i is %A")
