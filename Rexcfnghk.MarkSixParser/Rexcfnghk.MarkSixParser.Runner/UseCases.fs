@@ -27,18 +27,20 @@ let getMultipleUsersDraw () =
         if decision = "n" || decision = "N"
         then List.rev acc
         else
-            printfn "Enter user's #%i draw" (i + 1)
+            let newCount = i + 1
+            printfn "Enter user's #%i draw" newCount
             let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") tryGetInteger
-            printfn "Continue entering user's draw #%i [YyNn]?" (i + 2)
+            printfn "Continue entering user's draw #%i [YyNn]?" (newCount + 1)
             let decision = stdin.ReadLine()
-            getUsersDrawNumbers' decision (usersDraw :: acc) (i + 1)
+            getUsersDrawNumbers' decision (usersDraw :: acc) newCount
 
     let printUsersDrawList =
         let rec printUsersDrawListImpl acc = function
             | [] -> printfn "You entered %i user's draw(s)" acc
             | h :: t -> 
-                printfn "User's draw #%i: %A" acc h
-                printUsersDrawListImpl (acc + 1) t
+                let newCount = acc + 1
+                printfn "User's draw #%i: %A" newCount h
+                printUsersDrawListImpl newCount t
         printUsersDrawListImpl 0
 
     let usersDrawList = getUsersDrawNumbers' "Y" [] 0
