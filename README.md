@@ -13,16 +13,22 @@ Enter draw results
 5
 6
 7
-The draw results are [DrawNumber 1; DrawNumber 2; DrawNumber 3; DrawNumber 4; DrawNumber 5; DrawNumber 6; ExtraNumber 7]
-Enter user's draw
+The draw results are DrawResults
+  (DrawnNumber 1,DrawnNumber 2,DrawnNumber 3,DrawnNumber 4,DrawnNumber 5,
+   DrawnNumber 6,ExtraNumber 7)
+   
+Enter user's #1 draw
 1
 2
 3
 4
 5
 6
-User's draw is [1; 2; 3; 4; 5; 6]
-Your prize is First
+Continue entering user's draw #2 [YyNn]?
+n
+User's draw #1: UsersDraw (1,2,3,4,5,6)
+You entered 1 user's draw(s)
+Your prize for draw #0 is First
 ```
 
 ```
@@ -34,16 +40,22 @@ Enter draw results
 5
 6
 7
-The draw results are [DrawNumber 1; DrawNumber 2; DrawNumber 3; DrawNumber 4; DrawNumber 5; DrawNumber 6; ExtraNumber 7]
-Enter user's draw
+The draw results are DrawResults
+  (DrawnNumber 1,DrawnNumber 2,DrawnNumber 3,DrawnNumber 4,DrawnNumber 5,
+   DrawnNumber 6,ExtraNumber 7)
+   
+Enter user's #1 draw
 1
 2
 3
 4
 48
 49
-User's draw is [1; 2; 3; 4; 48; 49]
-Your prize is Fixed prize of HK$640.00
+Continue entering user's draw #2 [YyNn]?
+n
+User's draw #1: UsersDraw (1,2,3,4,48,49)
+You entered 1 user's draw(s)
+Your prize for draw #0 is Fixed prize of HK$640.00
 ```
 
 ```
@@ -59,14 +71,33 @@ ErrorMessage "Adding duplicate elements"
 50
 ErrorMessage "Input out of range"
 7
-The draw results are [DrawNumber 1; DrawNumber 2; DrawNumber 3; DrawNumber 4; DrawNumber 5; DrawNumber 6; ExtraNumber 7]
-Enter user's draw
+The draw results are DrawResults
+  (DrawnNumber 1,DrawnNumber 2,DrawnNumber 3,DrawnNumber 4,DrawnNumber 5,
+   DrawnNumber 6,ExtraNumber 7)
+   
+Enter user's #1 draw
 1
 2
 3
 4
 48
 49
-User's draw is [1; 2; 3; 4; 48; 49]
-Your prize is Fixed prize of HK$640.00
+Continue entering user's draw #2 [YyNn]?
+y
+Enter user's #2 draw
+2
+3
+4
+sdf
+ErrorMessage "Input is not an integer"
+5
+6
+7
+Continue entering user's draw #3 [YyNn]?
+n
+User's draw #1: UsersDraw (1,2,3,4,48,49)
+User's draw #2: UsersDraw (2,3,4,5,6,7)
+You entered 2 user's draw(s)
+Your prize for draw #0 is Fixed prize of HK$640.00
+Your prize for draw #1 is Second
 ```
