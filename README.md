@@ -28,7 +28,7 @@ Continue entering user's draw #2 [YyNn]?
 n
 User's draw #1: UsersDraw (1,2,3,4,5,6)
 You entered 1 user's draw(s)
-Your prize for draw #0 is First
+Your prize for draw #1 is First
 ```
 
 ```
@@ -55,7 +55,7 @@ Continue entering user's draw #2 [YyNn]?
 n
 User's draw #1: UsersDraw (1,2,3,4,48,49)
 You entered 1 user's draw(s)
-Your prize for draw #0 is Fixed prize of HK$640.00
+Your prize for draw #1 is Fixed prize of HK$640.00
 ```
 
 ```
@@ -98,6 +98,6 @@ n
 User's draw #1: UsersDraw (1,2,3,4,48,49)
 User's draw #2: UsersDraw (2,3,4,5,6,7)
 You entered 2 user's draw(s)
-Your prize for draw #0 is Fixed prize of HK$640.00
-Your prize for draw #1 is Second
+Your prize for draw #1 is Fixed prize of HK$640.00
+Your prize for draw #2 is Second
 ```
