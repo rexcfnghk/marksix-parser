@@ -51,4 +51,4 @@ let checkMultipleResults drawResults =
     List.map (MarkSix.checkResults (printfn "%A") drawResults)
 
 let printPrizes<'a> : 'a list -> unit = 
-    List.iteri (printfn "Your prize for draw #%i is %A")
+    List.iteri (fun i -> printfn "Your prize for draw #%i is %A" (i + 1))
