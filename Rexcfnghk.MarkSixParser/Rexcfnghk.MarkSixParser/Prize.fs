@@ -18,7 +18,7 @@ type T =
         | Third -> "Third"
         | Normal p -> sprintf "Fixed prize of HK$%s" <| (decimal p).ToString("#,##0.00")
         | NoPrize -> "No prize"
-    member this.AsString = this.ToString()
+    member private this.AsString = this.ToString()
 
 let fromPoints = function
     | Points 3m -> Normal 40m<hkd>

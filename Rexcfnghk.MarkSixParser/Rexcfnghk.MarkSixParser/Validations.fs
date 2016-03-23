@@ -10,7 +10,7 @@ type ValidationResult<'a> =
         match this with
         | Success s -> sprintf "%A" s
         | Error e -> sprintf "%A" e
-    member this.AsString = this.ToString()
+    member private this.AsString = this.ToString()
 
 module ValidationResult =
     let success = Success

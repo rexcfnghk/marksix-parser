@@ -30,7 +30,7 @@ type T =
 
     override this.ToString() = sprintf "%i" <| this.GetHashCode()
 
-    member this.AsString = this.ToString()
+    member private this.AsString = this.ToString()
 
 let create input = 
     if input >= 1 && input <= 49 then

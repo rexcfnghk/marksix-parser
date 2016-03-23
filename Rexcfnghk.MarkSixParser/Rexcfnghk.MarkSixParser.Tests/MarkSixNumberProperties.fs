@@ -35,9 +35,9 @@ let ``x less than y infers MarkSixNumber<x> is less than MarkSixNumber<y>`` () =
     let xyGenerator =
         Gen.elements [1..49]
         |> Gen.two
-        |> Gen.suchThat (fun (x, y) -> x.CompareTo y < 0)
+        |> Gen.suchThat (fun (x, y) -> x < y)
         |> Arb.fromGen
     let extract = MarkSixNumber.create >> ValidationResult.extract
     Prop.forAll xyGenerator <| fun (x, y) ->
         let m1, m2 = extract x, extract y
-        (m1 :> IComparable<MarkSixNumber.T>).CompareTo(m2) <! 0
+        m1 <! m2
