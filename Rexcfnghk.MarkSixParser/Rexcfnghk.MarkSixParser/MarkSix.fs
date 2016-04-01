@@ -24,11 +24,11 @@ let toDrawResults = function
 
 let randomUsersDraw () =
     let r = Random()
-    let l = [ for _ in 1..6 -> 
-                r.Next(1, 50) 
-                |> MarkSixNumber.create
-                |> ValidationResult.extract ]
-    l |> toUsersDraw |> ValidationResult.extract
+    fun _ -> r.Next(1, 50)
+    |> List.init 6
+    |> ValidationResult.traverse MarkSixNumber.create
+    >>= toUsersDraw
+    |> ValidationResult.extract
 
 let private addUniqueToList maxCount errorHandler getNumber =
     let addToSet acc input =
