@@ -9,16 +9,7 @@ let tryGetInteger () =
         | true, i -> ValidationResult.success i
         | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
 
-    let rec retryableErrorHandler getResult errorHandler =
-        match getResult () with
-        | Success i -> i
-        | Error e -> 
-            errorHandler e
-            retryableErrorHandler getResult errorHandler
-
-    let getInt32 = stdin.ReadLine >> validateInt32
-
-    retryableErrorHandler getInt32 (printfn "%A")
+    ValidationResult.retryable (printfn "%A") (stdin.ReadLine >> validateInt32)
 
 let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") tryGetInteger
 

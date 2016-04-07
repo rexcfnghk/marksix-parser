@@ -23,6 +23,13 @@ module ValidationResult =
         | Success x -> successHandler x
         | Error e -> errorHandler e
 
+    let rec retryable errorHandler f =
+        let result = f ()
+        let retry e =
+            errorHandler e
+            retryable errorHandler f
+        doubleMap id retry result
+
     let map f = doubleMap (f >> Success) Error
 
     let (<!>) = map
