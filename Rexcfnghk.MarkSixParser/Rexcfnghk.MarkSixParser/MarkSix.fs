@@ -6,8 +6,8 @@ open ValidationResult
 
 let toUsersDraw = function
     | [m1; m2; m3; m4; m5; m6] ->
-        UsersDraw (m1, m2, m3, m4, m5, m6)
-        |> Success
+        (m1, m2, m3, m4, m5, m6)
+        |> (UsersDraw >> Success)
     | _ -> 
         "Users draw expects a list of six MarkSixNumbers"
         |> ValidationResult.errorFromString
@@ -55,11 +55,17 @@ let private addUniqueToList maxCount errorHandler getNumber =
 
     addUniqueToListImpl Set.empty
 
-let getDrawResultNumbers errorHandler getNumber =
-    let maxDrawResultCount = 7
-    addUniqueToList maxDrawResultCount errorHandler getNumber
-    |> toDrawResults
-    |> ValidationResult.extract
+let private getNumbers errorHandler f maxCount =
+    addUniqueToList maxCount errorHandler
+    >> f
+    >> ValidationResult.extract
+
+let getDrawResultNumbers errorHandler =
+    getNumbers errorHandler toDrawResults 7
+//    let maxDrawResultCount = 7
+//    addUniqueToList maxDrawResultCount errorHandler
+//    >> toDrawResults
+//    >> ValidationResult.extract
 
 let getUsersDrawNumber errorHandler getNumber =
     let maxUsersDrawCount = 6
