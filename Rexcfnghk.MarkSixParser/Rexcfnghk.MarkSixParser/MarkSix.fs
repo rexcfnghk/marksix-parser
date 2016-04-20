@@ -62,16 +62,9 @@ let private getNumbers errorHandler f maxCount =
 
 let getDrawResultNumbers errorHandler =
     getNumbers errorHandler toDrawResults 7
-//    let maxDrawResultCount = 7
-//    addUniqueToList maxDrawResultCount errorHandler
-//    >> toDrawResults
-//    >> ValidationResult.extract
 
-let getUsersDrawNumber errorHandler getNumber =
-    let maxUsersDrawCount = 6
-    addUniqueToList maxUsersDrawCount errorHandler getNumber
-    |> toUsersDraw
-    |> ValidationResult.extract
+let getUsersDrawNumber errorHandler =
+    getNumbers errorHandler toUsersDraw 6
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique list =
