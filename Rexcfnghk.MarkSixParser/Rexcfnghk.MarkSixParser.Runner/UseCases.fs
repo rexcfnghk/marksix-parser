@@ -38,8 +38,9 @@ let getMultipleUsersDraw () =
     printUsersDrawList usersDrawList
     usersDrawList
 
-let checkMultipleResults drawResults =
-    List.map (MarkSix.checkResults (printfn "%A") drawResults)
+let checkMultipleResults =
+    MarkSix.checkResults (printfn "%A") >> ValidationResult.traverse
 
-let printPrizes<'a> : 'a list -> unit = 
-    List.iteri (fun i -> printfn "Your prize for draw #%i is %A" (i + 1))
+let printPrizes = function
+    | Success l -> List.iteri (fun i -> printfn "Your prize for draw #%i is %A" (i + 1)) l
+    | Error e -> printfn "%A" e

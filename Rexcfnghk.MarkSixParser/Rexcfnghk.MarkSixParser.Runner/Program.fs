@@ -11,8 +11,8 @@ let main _ =
 
     let usersDrawList = getMultipleUsersDraw ()
 
-    let prizes = checkMultipleResults drawResults usersDrawList
-    printPrizes prizes
+    let prizesResult = checkMultipleResults drawResults usersDrawList
+    printPrizes prizesResult
 
     stdin.ReadLine() |> ignore
     0 // return an integer exit code
