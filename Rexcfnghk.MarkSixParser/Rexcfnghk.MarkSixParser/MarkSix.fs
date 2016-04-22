@@ -37,20 +37,16 @@ let private addUniqueToList maxCount errorHandler getNumber =
         else Set.add input acc |> Success
 
     let createFromGetNumber set = 
-        getNumber >> MarkSixNumber.create >=> addToSet set
-
-    let rec retryableErrorHandler set =
-        match createFromGetNumber set () with
-        | Success s -> s
-        | Error e -> 
-            errorHandler e
-            retryableErrorHandler set
+        getNumber 
+        >> MarkSixNumber.create 
+        >=> addToSet set
+        |> ValidationResult.retryable errorHandler
 
     let rec addUniqueToListImpl acc =
         if Set.count acc = maxCount
         then acc |> Set.toList
         else
-            let updated = retryableErrorHandler acc
+            let updated = createFromGetNumber acc
             addUniqueToListImpl updated
 
     addUniqueToListImpl Set.empty
