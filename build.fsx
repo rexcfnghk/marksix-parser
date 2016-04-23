@@ -1,6 +1,7 @@
 #r @"packages/FAKE/tools/FakeLib.dll"
 open Fake
 open Fake.Testing.XUnit2
+open Fake.OpenCoverHelper
 
 let buildDir = "./build/"
 let testDir = "./tests/"
@@ -27,6 +28,15 @@ Target "RunTests" (fun _ ->
             { p with 
                 ShadowCopy = not <| hasBuildParam "ci" })
 )
+
+Target "OpenCover" (fun _ -> 
+    OpenCover (fun p ->
+        { p with
+            ExePath = "packages/OpenCover/tools/OpenCover.Console.exe"
+            TestRunnerExePath = "packages/xunit.runner.console/tools/xunit.console.exe"
+            Filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
+            Register = RegisterUser })
+        "./tests/Rexcfnghk.MarkSixParser.Tests.dll -noshadow")
 
 Target "Pack" (fun _ ->
     CreateDir deployDir
