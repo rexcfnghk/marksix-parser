@@ -49,6 +49,7 @@ Target "Pack" (fun _ ->
     ==> "BuildRunner"
     ==> "BuildTests"
     ==> "RunTests"
+    ==> "OpenCover"
     ==> "Pack"
         
 RunTargetOrDefault "Pack"
