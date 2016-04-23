@@ -25,7 +25,7 @@ Target "RunTests" (fun _ ->
     testDlls
         |> xUnit2 (fun p -> 
             { p with 
-                ShadowCopy = hasBuildParam "ci" })
+                ShadowCopy = not <| hasBuildParam "ci" })
 )
 
 Target "Pack" (fun _ ->
