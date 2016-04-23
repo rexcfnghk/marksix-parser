@@ -1,4 +1,5 @@
 #r @"packages/FAKE/tools/FakeLib.dll"
+open System
 open Fake
 open Fake.Testing.XUnit2
 open Fake.OpenCoverHelper
@@ -7,6 +8,7 @@ let buildDir = "./build/"
 let testDir = "./tests/"
 let testDlls = !! (testDir + "*.Tests.dll")
 let deployDir ="./release/"
+let isCIBuild = hasBuildParam "ci"
     
 Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
 
@@ -26,7 +28,7 @@ Target "RunTests" (fun _ ->
     testDlls
         |> xUnit2 (fun p -> 
             { p with 
-                ShadowCopy = not <| hasBuildParam "ci" })
+                ShadowCopy = not isCIBuild })
 )
 
 Target "OpenCover" (fun _ -> 
@@ -38,6 +40,14 @@ Target "OpenCover" (fun _ ->
             Register = RegisterUser
             Output = testDir + "results.xml" })
         <| testDir + "Rexcfnghk.MarkSixParser.Tests.dll -noshadow")
+        
+Target "SendToCoversall" (fun _ -> 
+    ExecProcess (fun info -> 
+        info.FileName <- "./packages/coveralls.io/tools/coveralls.net.exe"
+        info.Arguments <- sprintf "--opencover %sresults.xml" testDir
+    ) (TimeSpan.FromMinutes 1.)
+    |> ignore
+)
 
 Target "Pack" (fun _ ->
     CreateDir deployDir
@@ -51,6 +61,7 @@ Target "Pack" (fun _ ->
     ==> "BuildTests"
     ==> "RunTests"
     ==> "OpenCover"
+    =?> ("SendToCoversall", isCIBuild)
     ==> "Pack"
         
 RunTargetOrDefault "Pack"
