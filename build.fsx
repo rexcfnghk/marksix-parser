@@ -7,7 +7,7 @@ let testDir = "./tests/"
 let testDlls = !! (testDir + "*.Tests.dll")
 let deployDir ="./release/"
     
-Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir ])
+Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
 
 Target "BuildRunner" (fun _ ->
     !! "Rexcfnghk.MarkSixParser.*/*.fsproj"
