@@ -35,8 +35,9 @@ Target "OpenCover" (fun _ ->
             ExePath = "packages/OpenCover/tools/OpenCover.Console.exe"
             TestRunnerExePath = "packages/xunit.runner.console/tools/xunit.console.exe"
             Filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
-            Register = RegisterUser })
-        "./tests/Rexcfnghk.MarkSixParser.Tests.dll -noshadow")
+            Register = RegisterUser
+            Output = testDir + "results.xml" })
+        <| testDir + "Rexcfnghk.MarkSixParser.Tests.dll -noshadow")
 
 Target "Pack" (fun _ ->
     CreateDir deployDir
