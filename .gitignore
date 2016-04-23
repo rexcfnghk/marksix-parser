@@ -240,3 +240,6 @@ build/**/*.*
 tests/**/*.*
 release/**/*.*
 
+# OpenCover
+**/results.xml
+
