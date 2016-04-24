@@ -1,0 +1,24 @@
+version: 2.0.0+build.{build}
+configuration: Release
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: 2.0.0.{build}
+  assembly_file_version: 2.0.0.{build}
+  assembly_informational_version: 2.0.0.{build}
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: re5iZJ2dWXlxRYeVjMbajtL15VsMvkcguM3egGz4/7XGOrTAWfUs4OMobp9QU6Zb
+build_script:
+- cmd: .\build.bat Pack -ev ci
+test: off
+artifacts:
+- path: ./release/marksix-parser.zip
+  name: marksix-parser
+notifications:
+- provider: Slack
+  incoming_webhook: https://hooks.slack.com/services/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
+  channel: builds
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
