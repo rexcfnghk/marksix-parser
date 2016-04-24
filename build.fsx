@@ -1,5 +1,6 @@
 #r @"packages/FAKE/tools/FakeLib.dll"
 open System
+open System.Diagnostics
 open Fake
 open Fake.Testing.XUnit2
 open Fake.OpenCoverHelper
@@ -41,12 +42,15 @@ Target "OpenCover" (fun _ ->
             Output = testDir + "results.xml" })
         <| testDir + "Rexcfnghk.MarkSixParser.Tests.dll -noshadow")
         
-Target "SendToCoversall" (fun _ -> 
-    ExecProcess (fun info -> 
+Target "SendToCoveralls" (fun _ -> 
+    let configStartProcessInfoF (info: ProcessStartInfo) =
         info.FileName <- "./packages/coveralls.io/tools/coveralls.net.exe"
         info.Arguments <- sprintf "--opencover %sresults.xml" testDir
-    ) (TimeSpan.FromMinutes 1.)
-    |> ignore
+
+    let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 1.)
+    
+    if result <> 0 then
+        failwith "Cannot send code coverage results to Coveralls"
 )
 
 Target "Pack" (fun _ ->
@@ -61,7 +65,7 @@ Target "Pack" (fun _ ->
     ==> "BuildTests"
     ==> "RunTests"
     ==> "OpenCover"
-    =?> ("SendToCoversall", isCIBuild)
+    =?> ("SendToCoveralls", isCIBuild)
     ==> "Pack"
         
 RunTargetOrDefault "Pack"
