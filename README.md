@@ -8,10 +8,14 @@ This project uses [Paket](https://fsprojects.github.io/Paket/) as the package ma
 
 Run `build.sh` or `build.cmd` to:
   - Install dependencies using Paket
-  - Build (to `./build/`)
-  - Run xUnit tests (to `./tests/`)
-  - Run OpenCover (to `./tests/results.xml`)
+  - Clean `./build/`, `./tests/`, and `./release/` directories
+  - Build the app (to `./build/`)
+  - Build the tests (to `./tests/`)
+  - Run xUnit tests
+  - Run OpenCover and save results (to `./tests/results.xml`)
   - Zip the artifact (to `./release/marksix-parser.zip`)
+  
+If you simply install dependencies and start developing, run `.paket/paket.bootstrapper.exe` and `paket restore`.
 
 Sample output
 ---
