@@ -2,6 +2,21 @@
 
 A [Mark Six](http://bet.hkjc.com/marksix/?lang=en) result parser written in F#
 
+Installation
+---
+This project uses [Paket](https://fsprojects.github.io/Paket/) as the package manager and [FAKE](http://fsharp.github.io/FAKE/) as the build automation tool.
+
+Run `build.sh` or `build.cmd` to:
+  - Install dependencies using Paket
+  - Clean `./build/`, `./tests/`, and `./release/` directories
+  - Build the app (to `./build/`)
+  - Build the tests (to `./tests/`)
+  - Run xUnit tests
+  - Run OpenCover and save results (to `./tests/results.xml`)
+  - Zip the artifact (to `./release/marksix-parser.zip`)
+  
+If you simply install dependencies and start developing, run `.paket/paket.bootstrapper.exe` and `paket restore`.
+
 Sample output
 ---
 ```
