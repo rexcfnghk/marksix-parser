@@ -1,4 +1,6 @@
-﻿open UseCases
+﻿module Rexcfnghk.MarkSixParser.Program
+
+open UseCases
 
 open System
 
