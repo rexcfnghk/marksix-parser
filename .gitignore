@@ -243,3 +243,6 @@ release/**/*.*
 # OpenCover
 **/results.xml
 
+# VS Code
+.vscode/*
+
