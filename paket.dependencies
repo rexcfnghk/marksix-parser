@@ -5,7 +5,7 @@ nuget coveralls.io
 nuget FAKE
 nuget FsCheck.Xunit
 nuget OpenCover
-nuget ReportUnit
+nuget ReportGenerator
 nuget Unquote
 nuget xunit.assert
 nuget xunit.runner.console

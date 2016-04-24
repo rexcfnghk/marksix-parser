@@ -1,6 +1,3 @@
-coveralls.io
 FsCheck.Xunit
-OpenCover
 Unquote
 xunit.assert
-xunit.runner.console

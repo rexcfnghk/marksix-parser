@@ -10,6 +10,7 @@ let testDir = "./tests/"
 let testDlls = !! (testDir + "*.Tests.dll")
 let deployDir ="./release/"
 let isCIBuild = hasBuildParam "ci"
+let openCoverResultsXmlPath = testDir + "results.xml"
     
 Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
 
@@ -39,18 +40,29 @@ Target "OpenCover" (fun _ ->
             TestRunnerExePath = "packages/xunit.runner.console/tools/xunit.console.exe"
             Filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
             Register = RegisterUser
-            Output = testDir + "results.xml" })
+            Output = openCoverResultsXmlPath })
         <| testDir + "Rexcfnghk.MarkSixParser.Tests.dll -noshadow")
         
 Target "SendToCoveralls" (fun _ -> 
     let configStartProcessInfoF (info: ProcessStartInfo) =
         info.FileName <- "./packages/coveralls.io/tools/coveralls.net.exe"
-        info.Arguments <- sprintf "--opencover %sresults.xml" testDir
+        info.Arguments <- sprintf "--opencover %s" openCoverResultsXmlPath
 
     let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 1.)
     
     if result <> 0 then
         failwith "Cannot send code coverage results to Coveralls"
+)
+
+Target "RunReportGenerator" (fun _ -> 
+    let configStartProcessInfoF (info: ProcessStartInfo) =
+        info.FileName <- "./packages/ReportGenerator/tools/ReportGenerator.exe"
+        info.Arguments <- sprintf "-reports:%s -targetdir:%s/report" openCoverResultsXmlPath testDir
+    
+    let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 1.)
+    
+    if result <> 0 then
+        failwith "Cannot run ReportGenerator"
 )
 
 Target "Pack" (fun _ ->
@@ -67,5 +79,8 @@ Target "Pack" (fun _ ->
     ==> "OpenCover"
     =?> ("SendToCoveralls", isCIBuild)
     ==> "Pack"
+        
+"OpenCover"
+    ==> "RunReportGenerator"
         
 RunTargetOrDefault "Pack"
