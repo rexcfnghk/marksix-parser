@@ -1,7 +1,6 @@
 coveralls.io
 FsCheck.Xunit
 OpenCover
-ReportGenerator
 Unquote
 xunit.assert
 xunit.runner.console
