@@ -57,7 +57,7 @@ Target "SendToCoveralls" (fun _ ->
 Target "RunReportGenerator" (fun _ -> 
     let configStartProcessInfoF (info: ProcessStartInfo) =
         info.FileName <- "./packages/ReportGenerator/tools/ReportGenerator.exe"
-        info.Arguments <- sprintf "-reports:%s -targetdir:%s/report" openCoverResultsXmlPath testDir
+        info.Arguments <- sprintf "-reports:%s -targetdir:%sreport" openCoverResultsXmlPath testDir
     
     let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 1.)
     
