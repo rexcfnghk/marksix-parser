@@ -27,12 +27,40 @@ let drawResultsArb =
     |> Gen.map (MarkSix.toDrawResults >> ValidationResult.extract)
     |> Arb.fromGen
 
+let invalidLengthUsersDrawArb =
+    Arb.Default.NonNegativeInt().Generator
+    |> Gen.suchThat (fun x -> x.Get <> 0 && x.Get <> 6)
+    |> Gen.map (fun (NonNegativeInt x) -> x)
+    >>= (fun x -> Gen.listOfLength x markSixNumberGen)
+    |> Arb.fromGen
+
+let invalidLengthDrawResultsArb =
+    Arb.Default.NonNegativeInt().Generator
+    |> Gen.suchThat (fun x -> x.Get <> 0 && x.Get <> 7)
+    |> Gen.map (fun (NonNegativeInt x) -> x)
+    >>= (fun x -> Gen.listOfLength x markSixNumberGen)
+    |> Arb.fromGen
+
 [<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
     let (UsersDraw (m1, m2, m3, m4, m5, m6)) = MarkSix.randomUsersDraw ()
     let numbers = [m1; m2; m3; m4; m5; m6]
     test <@ List.forall (MarkSixNumber.value >> isWithinRange) numbers @>
+
+[<Property>]
+let ``toUsersDraw fails when given list length not equals to six`` () =
+    Prop.forAll invalidLengthUsersDrawArb <| fun l ->
+        test <@ match MarkSix.toUsersDraw l with
+                | Error _ -> true
+                | _ -> false @>
+
+[<Property>]
+let ``toDrawResults fails when given list length not equals to seven`` () =
+    Prop.forAll invalidLengthDrawResultsArb <| fun l ->
+        test <@ match MarkSix.toDrawResults l with
+                | Error _ -> true
+                | _ -> false @>
 
 [<Property(MaxTest = 500)>]
 let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw`` () =
