@@ -6,16 +6,18 @@ Installation
 ---
 This project uses [Paket](https://fsprojects.github.io/Paket/) as the package manager and [FAKE](http://fsharp.github.io/FAKE/) as the build automation tool.
 
-Run `build.sh` or `build.cmd` to:
+Run `build.sh` or `build.cmd` to (actual FAKE targets use in square brackets):
   - Install dependencies using Paket
-  - Clean `./build/`, `./tests/`, and `./release/` directories
-  - Build the app (to `./build/`)
-  - Build the tests (to `./tests/`)
-  - Run xUnit tests
-  - Run OpenCover and save results (to `./tests/results.xml`)
-  - Zip the artifact (to `./release/marksix-parser.zip`)
+  - Clean `./build/`, `./tests/`, and `./release/` directories [`clean`]
+  - Build the app (to `./build/`) [`BuildRunner`]
+  - Build the tests (to `./tests/`) [`BuildTests`]
+  - Run xUnit tests [`RunTests`]
+  - Run OpenCover and save results (to `./tests/results.xml`) [`OpenCover`]
+  - Zip the artifact (to `./release/marksix-parser.zip`) [`Pack`]
   
 If you simply want to install dependencies and start developing, run `.paket/paket.bootstrapper.exe` and `paket restore`.
+
+[AppVeyor CI build](https://ci.appveyor.com/project/rexcfnghk/marksix-parser) will also trigger OpenCover test coverage being sent to [Coveralls](https://coveralls.io/github/rexcfnghk/marksix-parser)
 
 Sample output
 ---
