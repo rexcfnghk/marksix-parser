@@ -15,7 +15,7 @@ Run `build.sh` or `build.cmd` to:
   - Run OpenCover and save results (to `./tests/results.xml`)
   - Zip the artifact (to `./release/marksix-parser.zip`)
   
-If you simply install dependencies and start developing, run `.paket/paket.bootstrapper.exe` and `paket restore`.
+If you simply want to install dependencies and start developing, run `.paket/paket.bootstrapper.exe` and `paket restore`.
 
 Sample output
 ---
