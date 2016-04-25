@@ -6,7 +6,7 @@ Installation
 ---
 This project uses [Paket](https://fsprojects.github.io/Paket/) as the package manager and [FAKE](http://fsharp.github.io/FAKE/) as the build automation tool.
 
-Run `build.sh` or `build.cmd` to (actual FAKE targets use in square brackets):
+Run `build.sh` or `build.cmd` to (actual FAKE targets used in square brackets):
   - Install dependencies using Paket
   - Clean `./build/`, `./tests/`, and `./release/` directories [`clean`]
   - Build the app (to `./build/`) [`BuildRunner`]
