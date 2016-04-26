@@ -1,4 +1,4 @@
-# marksix-parser [![Build status](https://ci.appveyor.com/api/projects/status/t0965lig3ndxg21i?svg=true)](https://ci.appveyor.com/project/rexcfnghk/marksix-parser) [![Coverage Status](https://coveralls.io/repos/github/rexcfnghk/marksix-parser/badge.svg?branch=master)](https://coveralls.io/github/rexcfnghk/marksix-parser?branch=master)
+# marksix-parser [![Build status](https://ci.appveyor.com/api/projects/status/t0965lig3ndxg21i?svg=true)](https://ci.appveyor.com/project/rexcfnghk/marksix-parser) [![Build Status](https://travis-ci.org/rexcfnghk/marksix-parser.svg?branch=develop)](https://travis-ci.org/rexcfnghk/marksix-parser) [![Coverage Status](https://coveralls.io/repos/github/rexcfnghk/marksix-parser/badge.svg?branch=master)](https://coveralls.io/github/rexcfnghk/marksix-parser?branch=master)
 
 A [Mark Six](http://bet.hkjc.com/marksix/?lang=en) result parser written in F#
 
