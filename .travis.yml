@@ -1,5 +1,4 @@
 language: csharp
-solution: Rexcfnghk.MarkSixParser.sln
 script:
   - ./build.sh Pack -ev ci
 before_install:
