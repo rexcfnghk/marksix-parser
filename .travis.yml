@@ -2,5 +2,7 @@ language: csharp
 solution: Rexcfnghk.MarkSixParser.sln
 script:
   - ./build.sh Pack -ev ci
+before_install:
+  - chmod +x ./build.sh
 notifications:
   slack: voyagers:oZDhMiQge4pAZ6hCEHvvLCMA
