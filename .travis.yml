@@ -1,0 +1,6 @@
+language: csharp
+solution: Rexcfnghk.MarkSixParser.sln
+script:
+  - ./build.sh Pack -ev ci
+notifications:
+  slack: voyagers:oZDhMiQge4pAZ6hCEHvvLCMA
