@@ -1,6 +1,7 @@
 #r @"packages/FAKE/tools/FakeLib.dll"
 open System
 open System.Diagnostics
+open System.IO
 open Fake
 open Fake.Testing.XUnit2
 open Fake.OpenCoverHelper
@@ -10,7 +11,8 @@ let testDir = "./tests/"
 let testDlls = !! (testDir + "*.Tests.dll")
 let deployDir ="./release/"
 let isCIBuild = hasBuildParam "ci"
-let openCoverResultsXmlPath = testDir + "results.xml"
+let openCoverResultsXmlPath = Path.Combine(testDir, "results.xml")
+let packageDir = Path.Combine(Directory.GetCurrentDirectory(), "packages/")
     
 Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
 
@@ -33,19 +35,25 @@ Target "RunTests" (fun _ ->
                 ShadowCopy = not isCIBuild })
 )
 
-Target "OpenCover" (fun _ -> 
-    OpenCover (fun p ->
-        { p with
-            ExePath = "packages/OpenCover/tools/OpenCover.Console.exe"
-            TestRunnerExePath = "packages/xunit.runner.console/tools/xunit.console.exe"
-            Filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
-            Register = RegisterUser
-            Output = openCoverResultsXmlPath })
-        <| testDir + "Rexcfnghk.MarkSixParser.Tests.dll -noshadow")
+Target "OpenCover" (fun _ ->
+    let configStartProcessInfoF (info: ProcessStartInfo) =
+        let xunitExePath = packageDir @@ "xunit.runner.console/tools/xunit.console.exe"
+        let filer = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
+        let targetArgs = testDir @@ "Rexcfnghk.MarkSixParser.Tests.dll -noshadow"
+        info.FileName <- packageDir @@ "OpenCover/tools/OpenCover.Console.exe"
+        info.Arguments <- 
+            sprintf """-target:"%s" -targetargs:"%s" -output:"%s" -filter:"%s" %s"""
+                xunitExePath targetArgs openCoverResultsXmlPath filer (if hasBuildParam "travis" then String.Empty else "-register:user")
+                
+    let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 5.)
+    
+    if result <> 0 then
+        failwith "Cannot run OpenCover"
+)
         
 Target "SendToCoveralls" (fun _ -> 
     let configStartProcessInfoF (info: ProcessStartInfo) =
-        info.FileName <- "./packages/coveralls.io/tools/coveralls.net.exe"
+        info.FileName <- packageDir @@ "coveralls.io/tools/coveralls.net.exe"
         info.Arguments <- sprintf "--opencover %s" openCoverResultsXmlPath
 
     let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 1.)
@@ -56,7 +64,7 @@ Target "SendToCoveralls" (fun _ ->
 
 Target "RunReportGenerator" (fun _ -> 
     let configStartProcessInfoF (info: ProcessStartInfo) =
-        info.FileName <- "./packages/ReportGenerator/tools/ReportGenerator.exe"
+        info.FileName <- packageDir @@ "ReportGenerator/tools/ReportGenerator.exe"
         info.Arguments <- sprintf "-reports:%s -targetdir:%sreport" openCoverResultsXmlPath testDir
     
     let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 1.)
@@ -69,7 +77,7 @@ Target "Pack" (fun _ ->
     CreateDir deployDir
     !! (buildDir + "/**/*.*")
         -- "*.zip"
-        |> Zip buildDir (deployDir + "marksix-parser.zip")
+        |> Zip buildDir (deployDir @@ "marksix-parser.zip")
 ) 
 
 "Clean"

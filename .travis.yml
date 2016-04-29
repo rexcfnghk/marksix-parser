@@ -1,7 +1,11 @@
 language: csharp
+branches:
+  only:
+    - net45-ci
 script:
-  - ./build.sh Pack -ev ci
+  - ./build.sh Pack -ev ci -ev travis
 before_install:
   - chmod +x ./build.sh
 notifications:
   slack: voyagers:oZDhMiQge4pAZ6hCEHvvLCMA
+  email: false
