@@ -62,3 +62,47 @@ let ``checkResults returns correct prize for sample usersDraw and drawResults 2`
         
     let result = MarkSix.checkResults ignore drawResults usersDraw |> ValidationResult.extract
     result =! NoPrize
+
+[<Fact>]
+let ``toDrawResults respects order of entering`` () =
+    let drawResults = 
+        [6; 7; 12; 15; 27; 36; 29]
+        |> List.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> (MarkSix.toDrawResults >> ValidationResult.extract)
+
+    let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
+                        DrawnNumber m4, DrawnNumber m5, DrawnNumber m6, ExtraNumber e)) = drawResults
+    let i1, i2, i3, i4, i5, i6, e = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                       MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6, 
+                                       MarkSixNumber.value e
+     
+    i1 =! 6
+    i2 =! 7
+    i3 =! 12
+    i4 =! 15
+    i5 =! 27
+    i6 =! 36
+    e =! 29
+
+[<Fact>]
+let ``getDrawResults respects order of entering`` () =
+    let ints = [| 6; 7; 12; 15; 27; 36; 29 |]
+    let mutable i = 0
+    let drawResults = MarkSix.getDrawResultNumbers ignore <| fun () -> 
+        let result = ints.[i]
+        i <- i + 1
+        result
+
+    let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
+                        DrawnNumber m4, DrawnNumber m5, DrawnNumber m6, ExtraNumber e)) = drawResults
+    let i1, i2, i3, i4, i5, i6, e = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                       MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6, 
+                                       MarkSixNumber.value e
+     
+    i1 =! 6
+    i2 =! 7
+    i3 =! 12
+    i4 =! 15
+    i5 =! 27
+    i6 =! 36
+    e =! 29
