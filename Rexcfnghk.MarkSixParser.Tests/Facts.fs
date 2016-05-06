@@ -88,6 +88,7 @@ let ``toDrawResults respects order of entering`` () =
 let ``getDrawResults respects order of entering`` () =
     let ints = [| 6; 7; 12; 15; 27; 36; 29 |]
     let mutable i = 0
+
     let drawResults = MarkSix.getDrawResultNumbers ignore <| fun () -> 
         let result = ints.[i]
         i <- i + 1
@@ -99,10 +100,4 @@ let ``getDrawResults respects order of entering`` () =
                                        MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6, 
                                        MarkSixNumber.value e
      
-    i1 =! 6
-    i2 =! 7
-    i3 =! 12
-    i4 =! 15
-    i5 =! 27
-    i6 =! 36
-    e =! 29
+    [i1; i2; i3; i4; i5; i6; e] =! List.ofArray ints
