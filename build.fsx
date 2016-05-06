@@ -11,8 +11,8 @@ let testDir = "./tests/"
 let testDlls = !! (testDir + "*.Tests.dll")
 let deployDir ="./release/"
 let isCIBuild = hasBuildParam "ci"
-let openCoverResultsXmlPath = Path.Combine(testDir, "results.xml")
-let packageDir = Path.Combine(Directory.GetCurrentDirectory(), "packages/")
+let openCoverResultsXmlPath = testDir @@ "results.xml"
+let packageDir = Directory.GetCurrentDirectory() @@ "packages/"
     
 Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
 
@@ -38,12 +38,12 @@ Target "RunTests" (fun _ ->
 Target "OpenCover" (fun _ ->
     let configStartProcessInfoF (info: ProcessStartInfo) =
         let xunitExePath = packageDir @@ "xunit.runner.console/tools/xunit.console.exe"
-        let filer = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
+        let filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
         let targetArgs = testDir @@ "Rexcfnghk.MarkSixParser.Tests.dll -noshadow"
         info.FileName <- packageDir @@ "OpenCover/tools/OpenCover.Console.exe"
         info.Arguments <- 
             sprintf """-target:"%s" -targetargs:"%s" -output:"%s" -filter:"%s" %s"""
-                xunitExePath targetArgs openCoverResultsXmlPath filer (if hasBuildParam "travis" then String.Empty else "-register:user")
+                xunitExePath targetArgs openCoverResultsXmlPath filter (if hasBuildParam "travis" then String.Empty else "-register:user")
                 
     let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 5.)
     
