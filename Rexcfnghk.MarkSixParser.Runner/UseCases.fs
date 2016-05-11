@@ -3,7 +3,7 @@
 open System
 open Rexcfnghk.MarkSixParser
 
-let tryGetInteger () = 
+let tryGetInteger _ = 
     let validateInt32 string =
         match Int32.TryParse string with
         | true, i -> ValidationResult.success i
@@ -13,7 +13,7 @@ let tryGetInteger () =
 
     ValidationResult.retryable (printfn "%A") intV
 
-let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") (fun _ -> tryGetInteger())
+let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") tryGetInteger
 
 let getMultipleUsersDraw () =
     let rec getUsersDrawNumbers' decision acc i =
@@ -22,7 +22,7 @@ let getMultipleUsersDraw () =
         else
             let newCount = i + 1
             printfn "Enter user's #%i draw" newCount
-            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") (fun _ -> tryGetInteger())
+            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") tryGetInteger
             printfn "Continue entering user's draw #%i [YyNn]?" (newCount + 1)
             let decision = stdin.ReadLine()
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount
