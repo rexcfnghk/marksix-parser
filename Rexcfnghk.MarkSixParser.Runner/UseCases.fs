@@ -9,9 +9,11 @@ let tryGetInteger () =
         | true, i -> ValidationResult.success i
         | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
 
-    ValidationResult.retryable (printfn "%A") (stdin.ReadLine >> validateInt32)
+    let intV = stdin.ReadLine() |> validateInt32
 
-let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") tryGetInteger
+    ValidationResult.retryable (printfn "%A") intV
+
+let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") (fun _ -> tryGetInteger())
 
 let getMultipleUsersDraw () =
     let rec getUsersDrawNumbers' decision acc i =
@@ -20,7 +22,7 @@ let getMultipleUsersDraw () =
         else
             let newCount = i + 1
             printfn "Enter user's #%i draw" newCount
-            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") tryGetInteger
+            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") (fun _ -> tryGetInteger())
             printfn "Continue entering user's draw #%i [YyNn]?" (newCount + 1)
             let decision = stdin.ReadLine()
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount

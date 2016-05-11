@@ -44,7 +44,7 @@ let private addUniqueToList maxCount errorHandler getNumber =
         |> ValidationResult.retryable errorHandler
 
     let rec addUniqueToListImpl i acc =
-        if i = maxCount - 1
+        if i = maxCount
         then List.rev acc
         else
             let updated = createFromGetNumber i acc
