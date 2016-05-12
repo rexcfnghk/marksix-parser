@@ -12,8 +12,9 @@ let toUsersDraw = function
         "Users draw expects a list of six MarkSixNumbers"
         |> ValidationResult.errorFromString
 
-let toDrawResults = function
-    | [d1; d2; d3; d4; d5; d6; e] -> 
+let toDrawResults (drawnNumberSet, extraNumber) =
+    match Set.toList drawnNumberSet, extraNumber with
+    | [d1; d2; d3; d4; d5; d6], e -> 
         (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
          DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
          ExtraNumber e)
@@ -57,8 +58,8 @@ let private getNumbers errorHandler f maxCount =
     >> f
     >> ValidationResult.extract
 
-let getDrawResultNumbers errorHandler =
-    getNumbers errorHandler toDrawResults 7
+let getDrawResultNumbers errorHandler (drawnNumberSet, extraNumber) =
+    toDrawResults (drawnNumberSet, extraNumber)
 
 let getUsersDrawNumber errorHandler =
     getNumbers errorHandler toUsersDraw 6

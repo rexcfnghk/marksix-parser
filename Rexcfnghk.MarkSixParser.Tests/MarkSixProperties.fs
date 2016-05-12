@@ -24,7 +24,7 @@ let usersDrawArb =
 
 let drawResultsArb =
     markSixNumberListGen 7
-    |> Gen.map (MarkSix.toDrawResults >> ValidationResult.extract)
+    |> Gen.map (function [] -> failwith "unexpected" | h :: t -> Set.ofList t, h)
     |> Arb.fromGen
 
 let invalidLengthUsersDrawArb =
@@ -39,6 +39,7 @@ let invalidLengthDrawResultsArb =
     |> Gen.suchThat (fun x -> x.Get <> 0 && x.Get <> 7)
     |> Gen.map (fun (NonNegativeInt x) -> x)
     >>= (fun x -> Gen.listOfLength x markSixNumberGen)
+    |> Gen.map (function [] -> failwith "unexpected" | h :: t -> Set.ofList t, h)
     |> Arb.fromGen
 
 [<Property>]
@@ -49,7 +50,7 @@ let ``drawRandom always returns numbers between 1 and 49`` () =
     test <@ List.forall (MarkSixNumber.value >> isWithinRange) numbers @>
 
 [<Property>]
-let ``toUsersDraw fails when given list length not equals to six`` () =
+let ``toUsersDraw fails when given set length not equals to six`` () =
     Prop.forAll invalidLengthUsersDrawArb <| fun l ->
         test <@ match MarkSix.toUsersDraw l with
                 | Error _ -> true
