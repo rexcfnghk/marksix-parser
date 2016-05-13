@@ -58,6 +58,7 @@
     <Compile Include="Facts.fs" />
     <Content Include="paket.references" />
     <Content Include="App.config" />
+    <Compile Include="ValidationResultFacts.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
