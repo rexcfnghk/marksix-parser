@@ -1,4 +1,4 @@
-﻿module Rexcfnghk.MarkSixParser.UseCases
+﻿module Rexcfnghk.MarkSixParser.Runner.UseCases
 
 open System
 open Rexcfnghk.MarkSixParser

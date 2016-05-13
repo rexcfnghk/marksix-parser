@@ -4,7 +4,8 @@ open System
 open Models
 open ValidationResult
 
-let toUsersDraw = function
+let toUsersDraw usersDrawSet =
+    match Set.toList usersDrawSet with
     | [m1; m2; m3; m4; m5; m6] ->
         (m1, m2, m3, m4, m5, m6)
         |> (UsersDraw >> Success)
@@ -28,6 +29,7 @@ let randomUsersDraw () =
     fun _ -> r.Next(1, 50)
     |> List.init 6
     |> ValidationResult.traverse MarkSixNumber.create
+    |> ValidationResult.map Set.ofList
     >>= toUsersDraw
     |> ValidationResult.extract
 
@@ -58,11 +60,9 @@ let private getNumbers errorHandler f maxCount =
     >> f
     >> ValidationResult.extract
 
-let getDrawResultNumbers (drawnNumberSet, extraNumber) =
-    toDrawResults (drawnNumberSet, extraNumber)
+let getDrawResultNumbers = toDrawResults
 
-let getUsersDrawNumber errorHandler =
-    getNumbers errorHandler toUsersDraw 6
+let getUsersDrawNumber = toUsersDraw
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique list =

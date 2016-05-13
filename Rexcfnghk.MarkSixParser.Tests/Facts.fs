@@ -42,14 +42,14 @@ let ``checkResults returns correct prize for sample usersDraw and drawResults`` 
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 31
 
-    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
-    | Error (ErrorMessage e) -> failwith e
-    | Success drawResults ->
-        let usersDraw = 
-            [3; 4; 24; 28; 30; 32]
-            |> List.map (MarkSixNumber.create >> ValidationResult.extract)
-            |> (MarkSix.toUsersDraw >> ValidationResult.extract)
+    let usersDraw = 
+        [| 3; 4; 24; 28; 30; 32 |]
+        |> Array.map createMarkSixNumber
+        |> Set.ofArray
 
+    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber), MarkSix.getUsersDrawNumber usersDraw with
+    | _, Error (ErrorMessage e) | Error (ErrorMessage e), _ -> failwith e
+    | Success drawResults, Success usersDraw ->
         let result = MarkSix.checkResults ignore drawResults usersDraw |> ValidationResult.extract
         result =! NoPrize
 
@@ -62,14 +62,14 @@ let ``checkResults returns correct prize for sample usersDraw and drawResults 2`
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 31
 
-    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
-    | Error (ErrorMessage e) -> failwith e
-    | Success drawResults ->
-        let usersDraw = 
-            [11; 14; 19; 31; 38; 39]
-            |> List.map (MarkSixNumber.create >> ValidationResult.extract)
-            |> (MarkSix.toUsersDraw >> ValidationResult.extract)
-        
+    let usersDraw = 
+        [| 11; 14; 19; 31; 38; 39 |]
+        |> Array.map createMarkSixNumber
+        |> Set.ofArray
+
+    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber), MarkSix.getUsersDrawNumber usersDraw with
+    | _, Error (ErrorMessage e) | Error (ErrorMessage e), _ -> failwith e
+    | Success drawResults, Success usersDraw ->       
         let result = MarkSix.checkResults ignore drawResults usersDraw |> ValidationResult.extract
         result =! NoPrize
 
@@ -121,19 +121,20 @@ let ``getDrawResults respects order of entering`` () =
 
 [<Fact>]
 let ``getUsersDrawNumbers respects order of entering`` () =
-    let ints = [| 6; 7; 12; 15; 27; 36 |]
-    let mutable i = 0
+    let createMarkSixNumber = MarkSixNumber.create >> ValidationResult.extract
+    let usersDraw = 
+        [| 6; 7; 12; 15; 27; 36 |]
+        |> Array.map createMarkSixNumber
+        |> Set.ofArray
 
-    let drawResults = MarkSix.getUsersDrawNumber ignore <| fun () ->
-        let result = ints.[i]
-        i <- i + 1
-        result
-
-    let (UsersDraw (m1, m2, m3, m4, m5, m6)) = drawResults
-    let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
-                                   MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
+    match MarkSix.getUsersDrawNumber usersDraw with
+    | Error (ErrorMessage e) -> failwith e
+    | Success usersDraw -> 
+        let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
+        let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                       MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
      
-    [i1; i2; i3; i4; i5; i6] =! List.ofArray ints
+        [i1; i2; i3; i4; i5; i6] =! List.ofArray [| 6; 7; 12; 15; 27; 36 |]
 
 [<Fact>]
 let ``getDrawResults accepts set of MarkSixNumbers`` () =
@@ -154,3 +155,20 @@ let ``getDrawResults accepts set of MarkSixNumbers`` () =
                                            MarkSixNumber.value e
      
         [i1; i2; i3; i4; i5; i6; e] =! [6; 7; 12; 15; 27; 36; 29]
+
+[<Fact>]
+let ``getUsersDraw accepts set of MarkSixNumbers`` () =
+    let createMarkSixNumber = MarkSixNumber.create >> ValidationResult.extract
+    let usersDrawNumbers = 
+        [| 6; 7; 12; 15; 27; 36 |]
+        |> Array.map createMarkSixNumber
+        |> Set.ofArray
+
+    match MarkSix.getUsersDrawNumber usersDrawNumbers with
+    | Error (ErrorMessage e) -> failwith e
+    | Success usersDraw ->
+        let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
+        let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                       MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
+     
+        [i1; i2; i3; i4; i5; i6] =! [6; 7; 12; 15; 27; 36]

@@ -10,21 +10,23 @@ let markSixNumberGen =
     Gen.elements [1..49]
     |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
 
-let markSixNumberListGen count =
+let markSixNumberArb = Arb.fromGen markSixNumberGen
+
+let markSixNumberSetGen count =
     markSixNumberGen
     |> Gen.listOfLength count
     |> Gen.map Set.ofList
     |> Gen.suchThat (fun s -> Set.count s >= count)
-    |> Gen.map (Seq.take count >> Seq.toList)
+    |> Gen.map (Seq.take count >> Set.ofSeq)
 
 let usersDrawArb = 
-    markSixNumberListGen 6
+    markSixNumberSetGen 6
     |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
     |> Arb.fromGen
 
 let drawResultsArb =
-    markSixNumberListGen 7
-    |> Gen.map (function [] -> failwith "unexpected" | h :: t -> Set.ofList t, h)
+    markSixNumberSetGen 7
+    |> Gen.map (Set.toList >> function [] -> failwith "unexpected" | h :: t -> Set.ofList t, h)
     |> Arb.fromGen
 
 let invalidLengthUsersDrawArb =
@@ -32,14 +34,16 @@ let invalidLengthUsersDrawArb =
     |> Gen.suchThat (fun x -> x.Get <> 0 && x.Get <> 6)
     |> Gen.map (fun (NonNegativeInt x) -> x)
     >>= (fun x -> Gen.listOfLength x markSixNumberGen)
+    |> Gen.map Set.ofList
     |> Arb.fromGen
 
 let invalidLengthDrawResultsArb =
-    Arb.Default.NonNegativeInt().Generator
-    |> Gen.suchThat (fun x -> x.Get <> 0 && x.Get <> 7)
-    |> Gen.map (fun (NonNegativeInt x) -> x)
-    >>= (fun x -> Gen.listOfLength x markSixNumberGen)
-    |> Gen.map (function [] -> failwith "unexpected" | h :: t -> Set.ofList t, h)
+    markSixNumberGen
+    |> Gen.listOf
+    |> Gen.suchThat (fun l -> List.length l >= 2 && List.length l <> 7)
+    |> Gen.map Set.ofList
+    |> Gen.suchThat (fun s -> Set.count s >= 2 && Set.count s <> 7)
+    |> Gen.map (Set.toList >> function [] -> failwith "unexpected" | h :: t -> Set.ofList t, h)
     |> Arb.fromGen
 
 [<Property>]
@@ -58,18 +62,13 @@ let ``toUsersDraw fails when given set length not equals to six`` () =
 
 [<Property>]
 let ``toDrawResults fails when given list length not equals to seven`` () =
-    Prop.forAll invalidLengthDrawResultsArb <| fun l ->
-        test <@ match MarkSix.toDrawResults l with
-                | Error _ -> true
-                | _ -> false @>
+    Prop.forAll invalidLengthDrawResultsArb <| fun drawResults ->
+            test <@ match MarkSix.toDrawResults drawResults with
+                    | Error _ -> true
+                    | _ -> false @>
 
 [<Property(MaxTest = 500)>]
 let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw`` () =
-    let splitDrawResults drawResults =
-        match List.rev drawResults with
-        | [] -> failwith "Should not reach here"
-        | h :: t -> t, h
-
     let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
         let points = 
             (Set.ofList usersDraw, drawResultWithoutExtraNumber)
