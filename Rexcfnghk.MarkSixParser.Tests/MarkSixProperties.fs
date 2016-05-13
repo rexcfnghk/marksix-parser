@@ -72,7 +72,7 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
 
     let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
         let points = 
-            (Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber)
+            (Set.ofList usersDraw, drawResultWithoutExtraNumber)
             ||> Set.intersect
             |> Set.count
             |> decimal
@@ -84,25 +84,23 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
 
         points + extraPoints |> Points
     
-    Prop.forAll drawResultsArb <| fun drawResults ->
+    Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
         Prop.forAll usersDrawArb <| fun usersDraw ->
             let extractedDrawResults =
-                let (DrawResults (
-                        DrawnNumber n1, DrawnNumber n2, DrawnNumber n3, 
-                        DrawnNumber n4, DrawnNumber n5, DrawnNumber n6, 
-                        ExtraNumber e)) = drawResults
-                [n1; n2; n3; n4; n5; n6; e]
+                (drawResultsSet, extraNumber)
+                |> MarkSix.toDrawResults
+                |> ValidationResult.extract
 
             let extractedUsersDraw =
                 let (UsersDraw (n1, n2, n3, n4, n5, n6)) = usersDraw
                 [n1; n2; n3; n4; n5; n6]
 
             let expected = 
-                calculatePoints extractedUsersDraw (splitDrawResults extractedDrawResults)
+                calculatePoints extractedUsersDraw (drawResultsSet, extraNumber)
                 |> Prize.fromPoints
  
             let actual =
-                MarkSix.checkResults ignore drawResults usersDraw
+                MarkSix.checkResults ignore extractedDrawResults usersDraw
                 |> ValidationResult.extract
 
             actual =! expected
