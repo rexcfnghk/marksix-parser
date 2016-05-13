@@ -3,15 +3,13 @@
 open System
 open Rexcfnghk.MarkSixParser
 
-let tryGetInteger _ = 
+let tryGetInteger () = 
     let validateInt32 string =
         match Int32.TryParse string with
         | true, i -> ValidationResult.success i
         | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
 
-    let intV = stdin.ReadLine() |> validateInt32
-
-    ValidationResult.retryable (printfn "%A") intV
+    ValidationResult.retryable (printfn "%A") (stdin.ReadLine >> validateInt32)
 
 let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") tryGetInteger
 

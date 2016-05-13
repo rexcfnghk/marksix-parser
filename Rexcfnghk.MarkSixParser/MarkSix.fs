@@ -34,23 +34,23 @@ let private addUniqueToList maxCount errorHandler getNumber =
     let addToSet acc input =
         let set = Set.ofList acc
         if Set.count set = List.length acc
-        then input :: acc |> ValidationResult.success
+        then (input :: acc) |> ValidationResult.success
         else "Adding duplicate elements" |> ValidationResult.errorFromString
 
-    let createFromGetNumber i list = 
-        getNumber i
-        |> MarkSixNumber.create 
-        >>= addToSet list
+    let createFromGetNumber list = 
+        getNumber 
+        >> MarkSixNumber.create 
+        >=> addToSet list
         |> ValidationResult.retryable errorHandler
 
-    let rec addUniqueToListImpl i acc =
-        if i = maxCount
+    let rec addUniqueToListImpl acc =
+        if List.length acc = maxCount
         then List.rev acc
         else
-            let updated = createFromGetNumber i acc
-            addUniqueToListImpl (i + 1) updated
+            let updated = createFromGetNumber acc
+            addUniqueToListImpl updated
 
-    addUniqueToListImpl 0 []
+    addUniqueToListImpl []
 
 let private getNumbers errorHandler f maxCount =
     addUniqueToList maxCount errorHandler
