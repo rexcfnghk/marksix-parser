@@ -58,7 +58,7 @@ let private getNumbers errorHandler f maxCount =
     >> f
     >> ValidationResult.extract
 
-let getDrawResultNumbers errorHandler (drawnNumberSet, extraNumber) =
+let getDrawResultNumbers (drawnNumberSet, extraNumber) =
     toDrawResults (drawnNumberSet, extraNumber)
 
 let getUsersDrawNumber errorHandler =

@@ -11,7 +11,7 @@ let tryGetInteger () =
 
     ValidationResult.retryable (printfn "%A") (stdin.ReadLine >> validateInt32)
 
-let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") tryGetInteger
+let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers tryGetInteger
 
 let getMultipleUsersDraw () =
     let rec getUsersDrawNumbers' decision acc i =

@@ -42,7 +42,7 @@ let ``checkResults returns correct prize for sample usersDraw and drawResults`` 
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 31
 
-    match MarkSix.getDrawResultNumbers ignore (drawNumbers, extraNumber) with
+    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let usersDraw = 
@@ -62,7 +62,7 @@ let ``checkResults returns correct prize for sample usersDraw and drawResults 2`
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 31
 
-    match MarkSix.getDrawResultNumbers ignore (drawNumbers, extraNumber) with
+    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let usersDraw = 
@@ -82,7 +82,7 @@ let ``toDrawResults respects order of entering`` () =
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 29
 
-    match MarkSix.getDrawResultNumbers ignore (drawNumbers, extraNumber) with
+    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
@@ -108,7 +108,7 @@ let ``getDrawResults respects order of entering`` () =
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 29
     
-    match MarkSix.getDrawResultNumbers ignore (drawNumbers, extraNumber) with
+    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
@@ -144,7 +144,7 @@ let ``getDrawResults accepts set of MarkSixNumbers`` () =
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 29
     
-    match MarkSix.getDrawResultNumbers ignore (drawNumbers, extraNumber) with
+    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
