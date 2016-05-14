@@ -2,17 +2,27 @@
 
 open System
 open Rexcfnghk.MarkSixParser
+open Rexcfnghk.MarkSixParser.ValidationResult
 
-let tryGetInteger () = 
+let readMarkSixNumber () = 
     let validateInt32 string =
         match Int32.TryParse string with
         | true, i -> ValidationResult.success i
         | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
 
-    ValidationResult.retryable (printfn "%A") (stdin.ReadLine >> validateInt32)
+    let createMarkSixNumberFromReadLine = stdin.ReadLine >> validateInt32 >=> MarkSixNumber.create
+    ValidationResult.retryable (printfn "%A") createMarkSixNumberFromReadLine
 
-let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers tryGetInteger
+let getDrawResultNumbers' () = 
+    let rec getDrawResultNumbersImpl acc =
+        if Set.count acc = 7
+        then acc
+        else 
+            let markSixNumber = readMarkSixNumber ()
+            getDrawResultNumbersImpl (Set.add markSixNumber acc)
 
+    getDrawResultNumbersImpl Set.empty
+            
 let getMultipleUsersDraw () =
     let rec getUsersDrawNumbers' decision acc i =
         if decision = "n" || decision = "N"
@@ -20,7 +30,7 @@ let getMultipleUsersDraw () =
         else
             let newCount = i + 1
             printfn "Enter user's #%i draw" newCount
-            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") tryGetInteger
+            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") readMarkSixNumber
             printfn "Continue entering user's draw #%i [YyNn]?" (newCount + 1)
             let decision = stdin.ReadLine()
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount
