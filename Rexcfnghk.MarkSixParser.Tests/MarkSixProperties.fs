@@ -51,7 +51,7 @@ let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
     let (UsersDraw (m1, m2, m3, m4, m5, m6)) = MarkSix.randomUsersDraw ()
     let numbers = [m1; m2; m3; m4; m5; m6]
-    test <@ List.forall (MarkSixNumber.value >> isWithinRange) numbers @>
+    List.forall (MarkSixNumber.value >> isWithinRange) numbers
 
 [<Property>]
 let ``toUsersDraw fails when given set length not equals to six`` () =

@@ -26,11 +26,20 @@ let toDrawResults (drawnNumberSet, extraNumber) =
 
 let randomUsersDraw () =
     let r = Random()
-    fun _ -> r.Next(1, 50)
-    |> List.init 6
-    |> ValidationResult.traverse MarkSixNumber.create
-    |> ValidationResult.map Set.ofList
-    >>= toUsersDraw
+
+    let rec randomUsersDrawImpl acc =
+        if Set.count acc = 6
+        then acc
+        else
+            let m = 
+                r.Next(1, 50)
+                |> MarkSixNumber.create
+                |> ValidationResult.extract
+
+            randomUsersDrawImpl (Set.add m acc)
+    
+    randomUsersDrawImpl Set.empty
+    |> toUsersDraw
     |> ValidationResult.extract
 
 let private addUniqueToList maxCount errorHandler getNumber =
