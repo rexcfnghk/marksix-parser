@@ -3,25 +3,49 @@
 open System
 open Rexcfnghk.MarkSixParser
 open Rexcfnghk.MarkSixParser.ValidationResult
+open Rexcfnghk.MarkSixParser.MarkSix
 
-let readMarkSixNumber () = 
+let readMarkSixNumber = 
     let validateInt32 string =
         match Int32.TryParse string with
         | true, i -> ValidationResult.success i
         | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
 
-    let createMarkSixNumberFromReadLine = stdin.ReadLine >> validateInt32 >=> MarkSixNumber.create
-    ValidationResult.retryable (printfn "%A") createMarkSixNumberFromReadLine
+    stdin.ReadLine >> validateInt32 >=> MarkSixNumber.create
 
+// TODO: Cannot use Set in initial entry because of positioning
+// Add to set to check for duplicates
 let getDrawResultNumbers' () = 
-    let rec getDrawResultNumbersImpl acc =
-        if Set.count acc = 7
+    let duplicateErrorMessage = 
+        "Duplicate mark six number entered"
+
+    let tryAddToSet acc element =
+        let updatedSet = Set.add element acc
+        if Set.count updatedSet = Set.count acc
+        then duplicateErrorMessage |> ValidationResult.errorFromString
+        else updatedSet |> ValidationResult.success
+
+    let tryReturnExtraNumber set element =
+        if Set.exists ((=) element) set
+        then duplicateErrorMessage |> ValidationResult.errorFromString
+        else element |> ValidationResult.success
+
+    let getDrawResultNumbersImpl acc =
+        if Set.count acc = 6
         then acc
         else 
-            let markSixNumber = readMarkSixNumber ()
-            getDrawResultNumbersImpl (Set.add markSixNumber acc)
+            let addMarkSixNumberToSet = readMarkSixNumber >=> tryAddToSet acc
+            ValidationResult.retryable (printfn "%A") addMarkSixNumberToSet
 
-    getDrawResultNumbersImpl Set.empty
+    let drawnNumbers = getDrawResultNumbersImpl Set.empty
+    let extraNumber = 
+        readMarkSixNumber
+        >=> tryReturnExtraNumber drawnNumbers
+        |> ValidationResult.retryable (printfn "%A")
+
+    (drawnNumbers, extraNumber)
+    |> MarkSix.toDrawResults
+    |> ValidationResult.extract
             
 let getMultipleUsersDraw () =
     let rec getUsersDrawNumbers' decision acc i =
