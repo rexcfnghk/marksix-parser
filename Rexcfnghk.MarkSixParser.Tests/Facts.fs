@@ -27,11 +27,7 @@ let ``checkResults returns error when drawResult contains duplicate`` () =
 
     let validationResult = MarkSix.checkResults ignore drawResults usersDraw
 
-    let error = match validationResult with
-                | Error _ -> true
-                | _ -> false
-
-    test <@ error @>
+    test <@ match validationResult with Error _ -> true | _ -> false @>
 
 [<Fact>]
 let ``checkResults returns correct prize for sample usersDraw and drawResults`` () =

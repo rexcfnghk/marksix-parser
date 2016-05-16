@@ -9,6 +9,8 @@ open Rexcfnghk.MarkSixParser.MarkSix
 let DuplicateErrorMessage = 
     "Duplicate mark six number entered"
 
+let defaultErrorHandler x = printfn "%A" x
+
 let readMarkSixNumber = 
     let validateInt32 string =
         match Int32.TryParse string with
@@ -28,7 +30,7 @@ let rec getDrawNumbers maxCount acc =
     then acc
     else 
         let readAndTryAddToSet = readMarkSixNumber >=> tryAddToSet acc
-        let updatedSet = ValidationResult.retryable (printfn "%A") readAndTryAddToSet
+        let updatedSet = ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
         getDrawNumbers maxCount updatedSet
 
 let getDrawResultNumbers' () = 
@@ -41,7 +43,7 @@ let getDrawResultNumbers' () =
     let extraNumber = 
         readMarkSixNumber
         >=> tryReturnExtraNumber drawnNumbers
-        |> ValidationResult.retryable (printfn "%A")
+        |> ValidationResult.retryable defaultErrorHandler
 
     (drawnNumbers, extraNumber)
     |> MarkSix.toDrawResults
@@ -77,7 +79,7 @@ let getMultipleUsersDraw () =
     usersDrawList
 
 let checkMultipleResults =
-    MarkSix.checkResults (printfn "%A") >> ValidationResult.traverse
+    MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse
 
 let printPrizes = function
     | Success l -> List.iteri (fun i -> printfn "Your prize for draw #%i is %A" (i + 1)) l
