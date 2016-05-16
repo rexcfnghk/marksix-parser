@@ -5,6 +5,10 @@ open Rexcfnghk.MarkSixParser
 open Rexcfnghk.MarkSixParser.ValidationResult
 open Rexcfnghk.MarkSixParser.MarkSix
 
+[<Literal>]
+let DuplicateErrorMessage = 
+    "Duplicate mark six number entered"
+
 let readMarkSixNumber = 
     let validateInt32 string =
         match Int32.TryParse string with
@@ -13,31 +17,27 @@ let readMarkSixNumber =
 
     stdin.ReadLine >> validateInt32 >=> MarkSixNumber.create
 
-// TODO: Cannot use Set in initial entry because of positioning
-// Add to set to check for duplicates
-let getDrawResultNumbers' () = 
-    let duplicateErrorMessage = 
-        "Duplicate mark six number entered"
-
+let rec getDrawNumbers maxCount acc =
     let tryAddToSet acc element =
         let updatedSet = Set.add element acc
         if Set.count updatedSet = Set.count acc
-        then duplicateErrorMessage |> ValidationResult.errorFromString
+        then DuplicateErrorMessage |> ValidationResult.errorFromString
         else updatedSet |> ValidationResult.success
 
+    if Set.count acc = maxCount
+    then acc
+    else 
+        let readAndTryAddToSet = readMarkSixNumber >=> tryAddToSet acc
+        let updatedSet = ValidationResult.retryable (printfn "%A") readAndTryAddToSet
+        getDrawNumbers maxCount updatedSet
+
+let getDrawResultNumbers' () = 
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
-        then duplicateErrorMessage |> ValidationResult.errorFromString
+        then DuplicateErrorMessage |> ValidationResult.errorFromString
         else element |> ValidationResult.success
 
-    let getDrawResultNumbersImpl acc =
-        if Set.count acc = 6
-        then acc
-        else 
-            let addMarkSixNumberToSet = readMarkSixNumber >=> tryAddToSet acc
-            ValidationResult.retryable (printfn "%A") addMarkSixNumberToSet
-
-    let drawnNumbers = getDrawResultNumbersImpl Set.empty
+    let drawnNumbers = getDrawNumbers 6 Set.empty
     let extraNumber = 
         readMarkSixNumber
         >=> tryReturnExtraNumber drawnNumbers
@@ -49,14 +49,14 @@ let getDrawResultNumbers' () =
             
 let getMultipleUsersDraw () =
     let rec getUsersDrawNumbers' decision acc i =
-        if decision = "n" || decision = "N"
+        if decision = 'n' || decision = 'N'
         then List.rev acc
         else
             let newCount = i + 1
             printfn "Enter user's #%i draw" newCount
-            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") readMarkSixNumber
+            let usersDraw = getDrawNumbers 6 Set.empty 
             printfn "Continue entering user's draw #%i [YyNn]?" (newCount + 1)
-            let decision = stdin.ReadLine()
+            let decision = stdin.ReadLine() |> char
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount
 
     let printUsersDrawList =
@@ -68,7 +68,11 @@ let getMultipleUsersDraw () =
                 printUsersDrawListImpl newCount t
         printUsersDrawListImpl 0
 
-    let usersDrawList = getUsersDrawNumbers' "Y" [] 0
+    let usersDrawList = 
+        getUsersDrawNumbers' 'Y' [] 0
+        |> ValidationResult.traverse MarkSix.toUsersDraw
+        |> ValidationResult.extract
+
     printUsersDrawList usersDrawList
     usersDrawList
 
