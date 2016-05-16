@@ -42,37 +42,6 @@ let randomUsersDraw () =
     |> toUsersDraw
     |> ValidationResult.extract
 
-let private addUniqueToList maxCount errorHandler getNumber =
-    let addToSet acc input =
-        let set = Set.ofList acc
-        if Set.count set = List.length acc
-        then (input :: acc) |> ValidationResult.success
-        else "Adding duplicate elements" |> ValidationResult.errorFromString
-
-    let createFromGetNumber list = 
-        getNumber 
-        >> MarkSixNumber.create 
-        >=> addToSet list
-        |> ValidationResult.retryable errorHandler
-
-    let rec addUniqueToListImpl acc =
-        if List.length acc = maxCount
-        then List.rev acc
-        else
-            let updated = createFromGetNumber acc
-            addUniqueToListImpl updated
-
-    addUniqueToListImpl []
-
-let private getNumbers errorHandler f maxCount =
-    addUniqueToList maxCount errorHandler
-    >> f
-    >> ValidationResult.extract
-
-let getDrawResultNumbers = toDrawResults
-
-let getUsersDrawNumber = toUsersDraw
-
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique list =
         let set = Set.ofList list

@@ -47,7 +47,7 @@ let ``checkResults returns correct prize for sample usersDraw and drawResults`` 
         |> Array.map createMarkSixNumber
         |> Set.ofArray
 
-    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber), MarkSix.getUsersDrawNumber usersDraw with
+    match MarkSix.toDrawResults (drawNumbers, extraNumber), MarkSix.toUsersDraw usersDraw with
     | _, Error (ErrorMessage e) | Error (ErrorMessage e), _ -> failwith e
     | Success drawResults, Success usersDraw ->
         let result = MarkSix.checkResults ignore drawResults usersDraw |> ValidationResult.extract
@@ -67,7 +67,7 @@ let ``checkResults returns correct prize for sample usersDraw and drawResults 2`
         |> Array.map createMarkSixNumber
         |> Set.ofArray
 
-    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber), MarkSix.getUsersDrawNumber usersDraw with
+    match MarkSix.toDrawResults (drawNumbers, extraNumber), MarkSix.toUsersDraw usersDraw with
     | _, Error (ErrorMessage e) | Error (ErrorMessage e), _ -> failwith e
     | Success drawResults, Success usersDraw ->       
         let result = MarkSix.checkResults ignore drawResults usersDraw |> ValidationResult.extract
@@ -82,7 +82,7 @@ let ``toDrawResults respects order of entering`` () =
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 29
 
-    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
+    match MarkSix.toDrawResults (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
@@ -108,7 +108,7 @@ let ``getDrawResults respects order of entering`` () =
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 29
     
-    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
+    match MarkSix.toDrawResults (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
@@ -127,7 +127,7 @@ let ``getUsersDrawNumbers respects order of entering`` () =
         |> Array.map createMarkSixNumber
         |> Set.ofArray
 
-    match MarkSix.getUsersDrawNumber usersDraw with
+    match MarkSix.toUsersDraw usersDraw with
     | Error (ErrorMessage e) -> failwith e
     | Success usersDraw -> 
         let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
@@ -145,7 +145,7 @@ let ``getDrawResults accepts set of MarkSixNumbers`` () =
         |> Set.ofArray
     let extraNumber = createMarkSixNumber 29
     
-    match MarkSix.getDrawResultNumbers (drawNumbers, extraNumber) with
+    match MarkSix.toDrawResults (drawNumbers, extraNumber) with
     | Error (ErrorMessage e) -> failwith e
     | Success drawResults ->
         let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
@@ -164,7 +164,7 @@ let ``getUsersDraw accepts set of MarkSixNumbers`` () =
         |> Array.map createMarkSixNumber
         |> Set.ofArray
 
-    match MarkSix.getUsersDrawNumber usersDrawNumbers with
+    match MarkSix.toUsersDraw usersDrawNumbers with
     | Error (ErrorMessage e) -> failwith e
     | Success usersDraw ->
         let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
