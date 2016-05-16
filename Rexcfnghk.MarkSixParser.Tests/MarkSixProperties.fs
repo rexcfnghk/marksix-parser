@@ -30,11 +30,11 @@ let drawResultsArb =
     |> Arb.fromGen
 
 let invalidLengthUsersDrawArb =
-    Arb.Default.NonNegativeInt().Generator
-    |> Gen.suchThat (fun x -> x.Get <> 0 && x.Get <> 6)
-    |> Gen.map (fun (NonNegativeInt x) -> x)
-    >>= (fun x -> Gen.listOfLength x markSixNumberGen)
+    markSixNumberGen
+    |> Gen.listOf
+    |> Gen.suchThat (fun l -> List.length l <> 6)
     |> Gen.map Set.ofList
+    |> Gen.suchThat (fun s -> Set.count s <> 6)
     |> Arb.fromGen
 
 let invalidLengthDrawResultsArb =
