@@ -27,31 +27,35 @@ let rec private getDrawNumbers maxCount acc =
         let updatedSet = ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
         getDrawNumbers maxCount updatedSet
 
-let getDrawResultNumbers' () = 
+let getDrawResultNumbers preEnterPrompt postEnterPrompt () = 
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
         then DuplicateErrorMessage |> ValidationResult.errorFromString
         else element |> ValidationResult.success
 
+    preEnterPrompt
     let drawnNumbers = getDrawNumbers 6 Set.empty
     let extraNumber = 
         readMarkSixNumber
         >=> tryReturnExtraNumber drawnNumbers
         |> ValidationResult.retryable defaultErrorHandler
 
-    (drawnNumbers, extraNumber)
-    |> MarkSix.toDrawResults
-    |> ValidationResult.extract
+    let drawResults = 
+        (drawnNumbers, extraNumber)
+        |> MarkSix.toDrawResults
+        |> ValidationResult.extract
+    postEnterPrompt drawResults
+    drawResults
             
-let getMultipleUsersDraw () =
+let getMultipleUsersDraw preEnterPrompt postEnterPrompt () =
     let rec getUsersDrawNumbers' decision acc i =
         if decision = 'n' || decision = 'N'
         then List.rev acc
         else
             let newCount = i + 1
-            printfn "Enter user's #%i draw" newCount
+            preEnterPrompt newCount
             let usersDraw = getDrawNumbers 6 Set.empty 
-            printfn "Continue entering user's draw #%i [YyNn]?" (newCount + 1)
+            postEnterPrompt (newCount + 1)
             let decision = stdin.ReadLine() |> char
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount
 
