@@ -18,13 +18,13 @@ Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
 
 Target "BuildRunner" (fun _ ->
     !! "Rexcfnghk.MarkSixParser.*/*.fsproj"
-        -- "Rexcfnghk.MarkSixParser.Tests/*.fsproj"
+        -- "Rexcfnghk.MarkSixParser.*.Tests/*.fsproj"
         |> MSBuildRelease buildDir "Build"
         |> Log "Runner built"
 )
 
 Target "BuildTests" (fun _ ->
-    !! "Rexcfnghk.MarkSixParser.Tests/*.fsproj"
+    !! "Rexcfnghk.MarkSixParser.*.Tests/*.fsproj"
         |> MSBuildDebug testDir "Build"
         |> Log "Tests built")
         
