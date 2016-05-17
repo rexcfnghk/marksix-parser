@@ -5,7 +5,8 @@ open ErrorHandling
 open MarkSixNumberReader
 
 let getDrawResultNumbers' =
-    getDrawResultNumbers (printfn "Enter draw results") (printfn "The draw results are %A")
+    printfn "Enter draw results"
+    getDrawResultNumbers  (printfn "The draw results are %A")
 
 let getMultipleUsersDraw' =
     getMultipleUsersDraw (printfn "Enter user's #%i draw") (printfn "Continue entering user's draw #%i [YyNn]?")

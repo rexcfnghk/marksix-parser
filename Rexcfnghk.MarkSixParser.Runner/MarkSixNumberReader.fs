@@ -27,13 +27,12 @@ let rec private getDrawNumbers maxCount acc =
         let updatedSet = ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
         getDrawNumbers maxCount updatedSet
 
-let getDrawResultNumbers preEnterPrompt postEnterPrompt () = 
+let getDrawResultNumbers postEnterPrompt () = 
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
         then DuplicateErrorMessage |> ValidationResult.errorFromString
         else element |> ValidationResult.success
 
-    preEnterPrompt
     let drawnNumbers = getDrawNumbers 6 Set.empty
     let extraNumber = 
         readMarkSixNumber
