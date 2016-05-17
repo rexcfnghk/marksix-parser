@@ -46,7 +46,7 @@ let getDrawResultNumbers postEnterPrompt () =
     postEnterPrompt drawResults
     drawResults
             
-let getMultipleUsersDraw preEnterPrompt postEnterPrompt () =
+let getMultipleUsersDraw preEnterPrompt postEnterPrompt listPrompt () =
     let rec getUsersDrawNumbers' decision acc i =
         if decision = 'n' || decision = 'N'
         then List.rev acc
@@ -58,19 +58,10 @@ let getMultipleUsersDraw preEnterPrompt postEnterPrompt () =
             let decision = stdin.ReadLine() |> char
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount
 
-    let printUsersDrawList =
-        let rec printUsersDrawListImpl acc = function
-            | [] -> printfn "You entered %i user's draw(s)" acc
-            | h :: t -> 
-                let newCount = acc + 1
-                printfn "User's draw #%i: %A" newCount h
-                printUsersDrawListImpl newCount t
-        printUsersDrawListImpl 0
-
     let usersDrawList = 
         getUsersDrawNumbers' 'Y' [] 0
         |> ValidationResult.traverse MarkSix.toUsersDraw
         |> ValidationResult.extract
 
-    printUsersDrawList usersDrawList
+    listPrompt usersDrawList
     usersDrawList

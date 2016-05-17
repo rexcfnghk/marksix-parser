@@ -9,7 +9,15 @@ let getDrawResultNumbers' =
     getDrawResultNumbers  (printfn "The draw results are %A")
 
 let getMultipleUsersDraw' =
-    getMultipleUsersDraw (printfn "Enter user's #%i draw") (printfn "Continue entering user's draw #%i [YyNn]?")
+    let printUsersDrawLength list = 
+        list |> (List.length >> printfn "You entered %i user's draw(s)")
+        list
+    let printUsersDrawElements = List.iteri (fun i -> printfn "User's draw #%i: %A" (i + 1))
+
+    getMultipleUsersDraw 
+        (printfn "Enter user's #%i draw") 
+        (printfn "Continue entering user's draw #%i [YyNn]?")
+        (printUsersDrawLength >> printUsersDrawElements)
 
 let checkMultipleResults =
     MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse
