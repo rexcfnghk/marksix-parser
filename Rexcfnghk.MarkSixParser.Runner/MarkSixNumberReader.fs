@@ -13,27 +13,31 @@ let readMarkSixNumber =
 
     stdin.ReadLine >> validateInt32 >=> MarkSixNumber.create
 
-let rec private getDrawNumbers maxCount acc =
+let rec private getDrawNumbers markSixNumberReader maxCount acc =
     let tryAddToSet acc element =
         let updatedSet = Set.add element acc
         if Set.count updatedSet = Set.count acc
         then DuplicateErrorMessage |> ValidationResult.errorFromString
         else updatedSet |> ValidationResult.success
 
-    if Set.count acc = maxCount
+    let index = Set.count acc
+
+    if index = maxCount
     then acc
     else 
-        let readAndTryAddToSet = readMarkSixNumber >=> tryAddToSet acc
-        let updatedSet = ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
-        getDrawNumbers maxCount updatedSet
+        let readAndTryAddToSet () = 
+            index |> markSixNumberReader >>= tryAddToSet acc
+        let updatedSet = 
+            ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
+        getDrawNumbers markSixNumberReader maxCount updatedSet
 
-let getDrawResultNumbers postEnterPrompt () = 
+let getDrawResultNumbers markSixNumberReader postEnterPrompt () = 
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
         then DuplicateErrorMessage |> ValidationResult.errorFromString
         else element |> ValidationResult.success
 
-    let drawnNumbers = getDrawNumbers 6 Set.empty
+    let drawnNumbers = getDrawNumbers markSixNumberReader 6 Set.empty
     let extraNumber = 
         readMarkSixNumber
         >=> tryReturnExtraNumber drawnNumbers
@@ -46,14 +50,14 @@ let getDrawResultNumbers postEnterPrompt () =
     postEnterPrompt drawResults
     drawResults
             
-let getMultipleUsersDraw preEnterPrompt postEnterPrompt listPrompt () =
+let getMultipleUsersDraw markSixNumberReader preEnterPrompt postEnterPrompt listPrompt () =
     let rec getUsersDrawNumbers' decision acc i =
         if decision = 'n' || decision = 'N'
         then List.rev acc
         else
             let newCount = i + 1
             preEnterPrompt newCount
-            let usersDraw = getDrawNumbers 6 Set.empty 
+            let usersDraw = getDrawNumbers markSixNumberReader 6 Set.empty 
             postEnterPrompt (newCount + 1)
             let decision = stdin.ReadLine() |> char
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount

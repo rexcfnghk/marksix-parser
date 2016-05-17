@@ -4,9 +4,12 @@ open Rexcfnghk.MarkSixParser
 open ErrorHandling
 open MarkSixNumberReader
 
+let markSixNumberReader _ =
+    readMarkSixNumber ()
+
 let getDrawResultNumbers' =
     printfn "Enter draw results"
-    getDrawResultNumbers  (printfn "The draw results are %A")
+    getDrawResultNumbers markSixNumberReader (printfn "The draw results are %A")
 
 let getMultipleUsersDraw' =
     let printUsersDrawLength list = 
@@ -15,6 +18,7 @@ let getMultipleUsersDraw' =
     let printUsersDrawElements = List.iteri (fun i -> printfn "User's draw #%i: %A" (i + 1))
 
     getMultipleUsersDraw 
+        markSixNumberReader
         (printfn "Enter user's #%i draw") 
         (printfn "Continue entering user's draw #%i [YyNn]?")
         (printUsersDrawLength >> printUsersDrawElements)
