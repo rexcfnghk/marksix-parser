@@ -68,10 +68,8 @@ let getMultipleUsersDraw getSingleUsersDraw listPrompt decisionPrompt =
         then List.rev acc
         else
             let usersDraw = getSingleUsersDraw i
-            let newCount = i + 1
-
             let decision = decisionPrompt ()
-            getUsersDrawNumbers' decision (usersDraw :: acc) newCount
+            getUsersDrawNumbers' decision (usersDraw :: acc) (i + 1)
 
     let usersDrawList = 
         getUsersDrawNumbers' 'Y' [] 0
