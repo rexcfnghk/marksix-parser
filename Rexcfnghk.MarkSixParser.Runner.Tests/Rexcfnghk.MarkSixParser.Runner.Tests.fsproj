@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Facts.fs" />
+    <Compile Include="DecisionProperties.fs" />
     <None Include="paket.references" />
     <Content Include="App.config" />
   </ItemGroup>
