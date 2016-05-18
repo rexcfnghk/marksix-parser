@@ -28,3 +28,17 @@ let ``getDrawNumbers accepts markSixNumberReader parameter`` () =
     i5 =! 27
     i6 =! 36
     e =! 29
+
+[<Fact>]
+let ``getUsersDraw accepts markSixNumberReader parameter`` () = 
+    let m6Numbers =
+        [| 3; 4; 24; 28; 30; 32 |]
+        |> Array.map (MarkSixNumber.create)
+
+    let usersDraw = getUsersDrawNumbers (Array.get m6Numbers) ignore ()
+
+    let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
+    let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                    MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
+     
+    [| i1; i2; i3; i4; i5; i6 |] =! [| 3; 4; 24; 28; 30; 32 |]
