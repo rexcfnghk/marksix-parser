@@ -39,7 +39,7 @@ let getDrawResultNumbers markSixNumberReader postEnterPrompt () =
 
     let drawnNumbers = getDrawNumbers markSixNumberReader 6 Set.empty
     let extraNumber = 
-        readMarkSixNumber
+        (fun () -> markSixNumberReader 6)
         >=> tryReturnExtraNumber drawnNumbers
         |> ValidationResult.retryable defaultErrorHandler
 

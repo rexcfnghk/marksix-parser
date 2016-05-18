@@ -10,7 +10,7 @@ open Swensen.Unquote
 [<Fact>]
 let ``getDrawNumbers accepts markSixNumberReader parameter`` () =
     let m6Numbers = 
-        [| 6; 7; 12; 15; 27; 36 |]
+        [| 6; 7; 12; 15; 27; 36; 29 |]
         |> Array.map (MarkSixNumber.create)
 
     let drawResults = getDrawResultNumbers (Array.get m6Numbers) ignore ()
