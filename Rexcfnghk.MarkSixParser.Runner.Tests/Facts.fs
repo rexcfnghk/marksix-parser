@@ -13,7 +13,7 @@ let ``getDrawNumbers accepts markSixNumberReader parameter`` () =
         [| 6; 7; 12; 15; 27; 36; 29 |]
         |> Array.map (MarkSixNumber.create)
 
-    let drawResults = getDrawResultNumbers (Array.get m6Numbers) ignore ()
+    let drawResults = getDrawResultNumbers (Array.get m6Numbers) ignore
 
     let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
                     DrawnNumber m4, DrawnNumber m5, DrawnNumber m6, ExtraNumber e)) = drawResults
@@ -35,10 +35,27 @@ let ``getUsersDraw accepts markSixNumberReader parameter`` () =
         [| 3; 4; 24; 28; 30; 32 |]
         |> Array.map (MarkSixNumber.create)
 
-    let usersDraw = getUsersDrawNumbers (Array.get m6Numbers) ignore ()
+    let usersDraw = getUsersDrawNumbers (Array.get m6Numbers) ignore
 
     let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
     let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
                                     MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
      
     [| i1; i2; i3; i4; i5; i6 |] =! [| 3; 4; 24; 28; 30; 32 |]
+
+[<Fact>]
+let ``getUsersDrawNumbers can accept convert UsersDraw list`` () =
+    let m6NumberList = [
+        [| 3; 4; 24; 28; 30; 32 |]
+        [| 1; 2; 3; 4; 5; 6 |] ]
+    let list = List.map (Array.map MarkSixNumber.create) m6NumberList
+
+    let usersDrawList = List.map (fun arr -> getUsersDrawNumbers (Array.get arr) ignore) list
+
+    test <@ List.forall2 (fun usersDraw m6Number ->
+        let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
+        let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                        MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
+     
+        [| i1; i2; i3; i4; i5; i6 |] = m6Number)
+    usersDrawList m6NumberList @>

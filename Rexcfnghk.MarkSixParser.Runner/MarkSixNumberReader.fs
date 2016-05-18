@@ -34,7 +34,7 @@ let rec private getDrawNumbers maxCount acc markSixNumberReader  =
 let getSixMarkSixNumbers =
     getDrawNumbers 6 Set.empty 
 
-let getDrawResultNumbers markSixNumberReader postEnterPrompt () = 
+let getDrawResultNumbers markSixNumberReader postEnterPrompt = 
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
         then DuplicateErrorMessage |> ValidationResult.errorFromString
@@ -54,7 +54,7 @@ let getDrawResultNumbers markSixNumberReader postEnterPrompt () =
     postEnterPrompt drawResults
     drawResults
 
-let getUsersDrawNumbers markSixNumberReader postEnterPrompt () =
+let getUsersDrawNumbers markSixNumberReader postEnterPrompt =
     let usersDraw =
         getSixMarkSixNumbers markSixNumberReader
         |> MarkSix.toUsersDraw
@@ -62,24 +62,19 @@ let getUsersDrawNumbers markSixNumberReader postEnterPrompt () =
     postEnterPrompt usersDraw
     usersDraw
             
-let getMultipleUsersDraw markSixNumberReader preEnterPrompt postEnterPrompt listPrompt () =
+let getMultipleUsersDraw getSingleUsersDraw listPrompt decisionPrompt =
     let rec getUsersDrawNumbers' decision acc i =
         if decision = 'n' || decision = 'N'
         then List.rev acc
         else
+            let usersDraw = getSingleUsersDraw i
             let newCount = i + 1
-            preEnterPrompt newCount
 
-            let usersDraw = getSixMarkSixNumbers markSixNumberReader
-            postEnterPrompt (newCount + 1)
-
-            let decision = stdin.ReadLine() |> char
+            let decision = decisionPrompt ()
             getUsersDrawNumbers' decision (usersDraw :: acc) newCount
 
     let usersDrawList = 
         getUsersDrawNumbers' 'Y' [] 0
-        |> ValidationResult.traverse MarkSix.toUsersDraw
-        |> ValidationResult.extract
 
     listPrompt usersDrawList
     usersDrawList
