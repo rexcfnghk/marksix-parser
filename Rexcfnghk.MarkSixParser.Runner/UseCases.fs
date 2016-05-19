@@ -30,7 +30,7 @@ let getMultipleUsersDraw' () =
     getMultipleUsersDraw 
         (fun _ -> getUsersDrawNumbers' ())
         (printUsersDrawLength >> printUsersDrawElements)
-        decisionPrompt
+        (fun _ -> decisionPrompt ())
 
 let checkMultipleResults =
     MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse

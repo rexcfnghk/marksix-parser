@@ -63,16 +63,16 @@ let getUsersDrawNumbers markSixNumberReader postEnterPrompt =
     usersDraw
             
 let getMultipleUsersDraw getSingleUsersDraw listPrompt decisionPrompt =
-    let rec getUsersDrawNumbers' decision acc i =
-        if decision = 'n' || decision = 'N'
-        then List.rev acc
+    let generator (index, decision) =
+        if decision = 'Y' || decision = 'y'
+        then
+            let newIndex = index + 1 
+            Some (getSingleUsersDraw index, (newIndex, decisionPrompt newIndex))
         else
-            let usersDraw = getSingleUsersDraw i
-            let decision = decisionPrompt ()
-            getUsersDrawNumbers' decision (usersDraw :: acc) (i + 1)
+            None
 
     let usersDrawList = 
-        getUsersDrawNumbers' 'Y' [] 0
+        List.unfold generator (0, 'Y')
 
     listPrompt usersDrawList
     usersDrawList
