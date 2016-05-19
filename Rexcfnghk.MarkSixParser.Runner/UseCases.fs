@@ -24,10 +24,12 @@ let getMultipleUsersDraw' () =
 
     let printUsersDrawElements = List.iteri (addOne >> printfn "User's draw #%i: %A")
 
+    let decisionPrompt = stdin.ReadLine >> char
+
     getMultipleUsersDraw 
         (fun _ -> getUsersDrawNumbers' ())
         (printUsersDrawLength >> printUsersDrawElements)
-        (stdin.ReadLine >> char)
+        decisionPrompt
 
 let checkMultipleResults =
     MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse
