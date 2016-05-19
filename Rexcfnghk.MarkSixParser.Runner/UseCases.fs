@@ -4,6 +4,8 @@ open Rexcfnghk.MarkSixParser
 open ErrorHandling
 open MarkSixNumberReader
 
+let private addOne = (+) 1
+
 let markSixNumberReader _ =
     readMarkSixNumber ()
 
@@ -16,7 +18,6 @@ let getUsersDrawNumbers' () =
 
 let getMultipleUsersDraw' () =
     printfn "Enter users draw(s)"
-    let addOne = (+) 1
 
     let printUsersDrawLength list = 
         list |> (List.length >> printfn "You entered %i user's draw(s)")
@@ -35,5 +36,5 @@ let checkMultipleResults =
     MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse
 
 let printPrizes = function
-    | Success l -> List.iteri (fun i -> printfn "Your prize for draw #%i is %A" (i + 1)) l
+    | Success l -> List.iteri (addOne >> printfn "Your prize for draw #%i is %A") l
     | Error e -> printfn "%A" e
