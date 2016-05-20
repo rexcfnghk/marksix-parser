@@ -3,6 +3,7 @@
 open Rexcfnghk.MarkSixParser
 open Rexcfnghk.MarkSixParser.Models
 open Rexcfnghk.MarkSixParser.Runner.MarkSixNumberReader
+open Rexcfnghk.MarkSixParser.ValidationResult
 open Xunit
 open FsCheck.Xunit
 open Swensen.Unquote
@@ -59,3 +60,22 @@ let ``getUsersDrawNumbers can accept convert UsersDraw list`` () =
      
         [| i1; i2; i3; i4; i5; i6 |] = m6Number)
     usersDrawList m6NumberList @>
+
+[<Fact>]
+let ``getMultipleUsersDraw can accept multiple UsersDraw list`` () =
+    let usersDrawList = 
+        [|
+            [| 3; 4; 24; 28; 30; 32 |]
+            [| 1; 2; 3; 4; 5; 6 |] 
+        |]
+        |> Array.map (Array.map (MarkSixNumber.create >> ValidationResult.extract) >> Set.ofArray >> MarkSix.toUsersDraw)
+
+    let decisions = [| 'Y'; 'N' |]
+
+    let multipleUsersDrawResult = getMultipleUsersDraw (Array.get usersDrawList) ignore (fun i -> Array.get decisions (i - 1)) |> List.toArray
+
+    test <@ Array.forall2 (fun usersDraw m6Number ->
+        match usersDraw, m6Number with
+        | Error (ErrorMessage e), _ | _, Error (ErrorMessage e) -> failwith e
+        | Success usersDraw, Success m6Number ->
+            usersDraw = m6Number) multipleUsersDrawResult usersDrawList @>
