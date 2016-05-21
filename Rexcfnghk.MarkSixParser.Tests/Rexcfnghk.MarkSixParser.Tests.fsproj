@@ -57,7 +57,7 @@
     <Compile Include="PointsProperties.fs" />
     <Compile Include="Facts.fs" />
     <Compile Include="ValidationResultFacts.fs" />
-    <Compile Include="ValidationResultProperties.fs" />
+    <Compile Include="PrintFProperties.fs" />
     <Content Include="paket.references" />
     <Content Include="App.config" />
   </ItemGroup>
