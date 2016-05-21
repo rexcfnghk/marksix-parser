@@ -52,15 +52,12 @@ let getDrawResultNumbers markSixNumberReader =
     |> MarkSix.toDrawResults
     |> ValidationResult.extract
 
-let getUsersDrawNumbers markSixNumberReader postEnterPrompt =
-    let usersDraw =
-        getSixMarkSixNumbers markSixNumberReader
-        |> MarkSix.toUsersDraw
-        |> ValidationResult.extract
-    postEnterPrompt usersDraw
-    usersDraw
+let getUsersDrawNumbers =
+    getSixMarkSixNumbers
+    >> MarkSix.toUsersDraw
+    >> ValidationResult.extract
             
-let getMultipleUsersDraw getSingleUsersDraw listPrompt decisionPrompt =
+let getMultipleUsersDraw getSingleUsersDraw decisionPrompt =
     let generator (index, decision) =
         if decision = Yes
         then
@@ -69,8 +66,4 @@ let getMultipleUsersDraw getSingleUsersDraw listPrompt decisionPrompt =
         else
             None
 
-    let usersDrawList = 
-        List.unfold generator (0, Yes)
-
-    listPrompt usersDrawList
-    usersDrawList
+    List.unfold generator (0, Yes)

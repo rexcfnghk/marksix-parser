@@ -17,7 +17,9 @@ let getDrawResultNumbers' () =
     drawResults
 
 let getUsersDrawNumbers' () =
-    getUsersDrawNumbers markSixNumberReader (printfn "User's draw is %A")
+    let usersDraw = getUsersDrawNumbers markSixNumberReader
+    printfn "User's draw is %A" usersDraw
+    usersDraw
 
 let getMultipleUsersDraw' () =
     printfn "Enter users draw(s)"
@@ -34,10 +36,15 @@ let getMultipleUsersDraw' () =
         >> Decision.toResult
         |> ValidationResult.retryable defaultErrorHandler
 
-    getMultipleUsersDraw 
-        (fun _ -> getUsersDrawNumbers' ())
-        (printUsersDrawLength >> printUsersDrawElements)
-        (fun _ -> decisionPrompt ())
+    let usersDraw = 
+        getMultipleUsersDraw 
+            (fun _ -> getUsersDrawNumbers' ())
+            (fun _ -> decisionPrompt ())
+
+    usersDraw
+    |> (printUsersDrawLength >> printUsersDrawElements)
+
+    usersDraw
 
 let checkMultipleResults =
     MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse

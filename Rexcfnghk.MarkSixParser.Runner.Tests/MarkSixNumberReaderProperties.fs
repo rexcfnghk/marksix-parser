@@ -68,7 +68,6 @@ let ``getMultipleUsersDraw can accept multiple users draws`` (NonNegativeInt siz
         let list = 
             MarkSixNumberReader.getMultipleUsersDraw
                 (Array.get array) 
-                ignore
                 (fun i -> Array.get decisionArray (i - 1))
 
         list =! Array.toList array
