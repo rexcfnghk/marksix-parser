@@ -60,6 +60,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Facts.fs" />
     <Compile Include="DecisionProperties.fs" />
+    <Compile Include="MarkSixNumberReaderProperties.fs" />
     <None Include="paket.references" />
     <Content Include="App.config" />
   </ItemGroup>
