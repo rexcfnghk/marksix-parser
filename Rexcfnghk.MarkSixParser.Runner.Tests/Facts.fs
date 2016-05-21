@@ -3,7 +3,7 @@
 open Rexcfnghk.MarkSixParser
 open Rexcfnghk.MarkSixParser.Models
 open Rexcfnghk.MarkSixParser.Runner.MarkSixNumberReader
-open Rexcfnghk.MarkSixParser.ValidationResult
+open Rexcfnghk.MarkSixParser.Runner.Decision
 open Xunit
 open FsCheck.Xunit
 open Swensen.Unquote
@@ -72,7 +72,7 @@ let ``getMultipleUsersDraw can accept multiple UsersDraw list`` () =
                         >> Set.ofArray
                         >> MarkSix.toUsersDraw)
 
-    let decisions = [| 'Y'; 'N' |]
+    let decisions = [| Yes; No |]
 
     let multipleUsersDrawResult = getMultipleUsersDraw (Array.get usersDrawList) ignore (fun i -> Array.get decisions (i - 1)) |> List.toArray
 

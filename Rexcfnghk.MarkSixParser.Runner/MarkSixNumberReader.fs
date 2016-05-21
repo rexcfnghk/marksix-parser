@@ -3,6 +3,7 @@
 open System
 open Rexcfnghk.MarkSixParser
 open Rexcfnghk.MarkSixParser.ValidationResult
+open Rexcfnghk.MarkSixParser.Runner.Decision
 open ErrorHandling
 
 let readMarkSixNumber = 
@@ -64,7 +65,7 @@ let getUsersDrawNumbers markSixNumberReader postEnterPrompt =
             
 let getMultipleUsersDraw getSingleUsersDraw listPrompt decisionPrompt =
     let generator (index, decision) =
-        if decision = 'Y' || decision = 'y'
+        if decision = Yes
         then
             let newIndex = index + 1 
             Some (getSingleUsersDraw index, (newIndex, decisionPrompt newIndex))
@@ -72,7 +73,7 @@ let getMultipleUsersDraw getSingleUsersDraw listPrompt decisionPrompt =
             None
 
     let usersDrawList = 
-        List.unfold generator (0, 'Y')
+        List.unfold generator (0, Yes)
 
     listPrompt usersDrawList
     usersDrawList

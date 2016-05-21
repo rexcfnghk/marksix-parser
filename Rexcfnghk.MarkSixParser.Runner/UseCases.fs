@@ -25,7 +25,11 @@ let getMultipleUsersDraw' () =
 
     let printUsersDrawElements = List.iteri (addOne >> printfn "User's draw #%i: %A")
 
-    let decisionPrompt = stdin.ReadLine >> char
+    let decisionPrompt () = 
+        stdin.ReadLine 
+        >> char
+        >> Decision.toResult
+        |> ValidationResult.retryable defaultErrorHandler
 
     getMultipleUsersDraw 
         (fun _ -> getUsersDrawNumbers' ())

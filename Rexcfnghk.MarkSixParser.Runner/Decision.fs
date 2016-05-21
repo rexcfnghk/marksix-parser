@@ -1,6 +1,7 @@
 ﻿module Rexcfnghk.MarkSixParser.Runner.Decision
 
 open System
+open Rexcfnghk.MarkSixParser
 
 type T = Yes | No
 
@@ -11,7 +12,7 @@ let (|EqualsIgnoreCase|_|) pattern char =
     then Some ()
     else None
 
-let ofCharOption = function
-    | EqualsIgnoreCase 'y' -> Some Yes
-    | EqualsIgnoreCase 'n' -> Some No
-    | _ -> None
+let toResult = function
+    | EqualsIgnoreCase 'y' -> Success Yes
+    | EqualsIgnoreCase 'n' -> Success No
+    | _ -> "Unrecognised decision" |> ValidationResult.errorFromString

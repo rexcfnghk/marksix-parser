@@ -54,3 +54,7 @@ module ValidationResult =
         let cons h t = h :: t
         let folder h t = cons <!> (f h) <*> t
         List.foldBack folder list (Success [])
+
+    let ofOption = function
+        | Some s -> Success s
+        | None -> "No value" |> errorFromString

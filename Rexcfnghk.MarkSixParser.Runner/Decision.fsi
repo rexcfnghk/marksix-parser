@@ -1,5 +1,7 @@
 ﻿module Rexcfnghk.MarkSixParser.Runner.Decision
 
+open Rexcfnghk.MarkSixParser
+
 type T = Yes | No
 
-val ofCharOption : char -> T option
+val toResult : char -> ValidationResult<T>
