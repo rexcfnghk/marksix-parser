@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{4024FC13-205F-4E90-B74C-47F0D476A84D}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,6 +13,8 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rexcfnghk.MarkSixParser.Runner", "Rexcfnghk.MarkSixParser.Runner\Rexcfnghk.MarkSixParser.Runner.fsproj", "{9A77F933-7DC9-4100-AE28-1B4EE58A5DE5}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rexcfnghk.MarkSixParser.Tests", "Rexcfnghk.MarkSixParser.Tests\Rexcfnghk.MarkSixParser.Tests.fsproj", "{F437204E-90E5-4FE4-ACB8-3E0D1AC0EA42}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rexcfnghk.MarkSixParser.Runner.Tests", "Rexcfnghk.MarkSixParser.Runner.Tests\Rexcfnghk.MarkSixParser.Runner.Tests.fsproj", "{DBB59135-87BE-465F-AF8E-397167DAA14A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{F437204E-90E5-4FE4-ACB8-3E0D1AC0EA42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F437204E-90E5-4FE4-ACB8-3E0D1AC0EA42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F437204E-90E5-4FE4-ACB8-3E0D1AC0EA42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBB59135-87BE-465F-AF8E-397167DAA14A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBB59135-87BE-465F-AF8E-397167DAA14A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBB59135-87BE-465F-AF8E-397167DAA14A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBB59135-87BE-465F-AF8E-397167DAA14A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

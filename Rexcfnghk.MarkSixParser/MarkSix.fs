@@ -4,7 +4,8 @@ open System
 open Models
 open ValidationResult
 
-let toUsersDraw = function
+let toUsersDraw usersDrawSet =
+    match Set.toList usersDrawSet with
     | [m1; m2; m3; m4; m5; m6] ->
         (m1, m2, m3, m4, m5, m6)
         |> (UsersDraw >> Success)
@@ -12,8 +13,9 @@ let toUsersDraw = function
         "Users draw expects a list of six MarkSixNumbers"
         |> ValidationResult.errorFromString
 
-let toDrawResults = function
-    | [d1; d2; d3; d4; d5; d6; e] -> 
+let toDrawResults (drawnNumberSet, extraNumber) =
+    match Set.toList drawnNumberSet, extraNumber with
+    | [d1; d2; d3; d4; d5; d6], e -> 
         (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
          DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
          ExtraNumber e)
@@ -24,44 +26,21 @@ let toDrawResults = function
 
 let randomUsersDraw () =
     let r = Random()
-    fun _ -> r.Next(1, 50)
-    |> List.init 6
-    |> ValidationResult.traverse MarkSixNumber.create
-    >>= toUsersDraw
-    |> ValidationResult.extract
 
-let private addUniqueToList maxCount errorHandler getNumber =
-    let addToSet acc input =
-        let set = Set.ofList acc
-        if Set.count set = List.length acc
-        then (input :: acc) |> ValidationResult.success
-        else "Adding duplicate elements" |> ValidationResult.errorFromString
-
-    let createFromGetNumber list = 
-        getNumber 
-        >> MarkSixNumber.create 
-        >=> addToSet list
-        |> ValidationResult.retryable errorHandler
-
-    let rec addUniqueToListImpl acc =
-        if List.length acc = maxCount
-        then List.rev acc
+    let rec randomUsersDrawImpl acc =
+        if Set.count acc = 6
+        then acc
         else
-            let updated = createFromGetNumber acc
-            addUniqueToListImpl updated
+            let m = 
+                r.Next(1, 50)
+                |> MarkSixNumber.create
+                |> ValidationResult.extract
 
-    addUniqueToListImpl []
-
-let private getNumbers errorHandler f maxCount =
-    addUniqueToList maxCount errorHandler
-    >> f
-    >> ValidationResult.extract
-
-let getDrawResultNumbers errorHandler =
-    getNumbers errorHandler toDrawResults 7
-
-let getUsersDrawNumber errorHandler =
-    getNumbers errorHandler toUsersDraw 6
+            randomUsersDrawImpl (Set.add m acc)
+    
+    randomUsersDrawImpl Set.empty
+    |> toUsersDraw
+    |> ValidationResult.extract
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique list =

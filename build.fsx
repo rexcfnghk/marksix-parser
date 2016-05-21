@@ -18,13 +18,13 @@ Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
 
 Target "BuildRunner" (fun _ ->
     !! "Rexcfnghk.MarkSixParser.*/*.fsproj"
-        -- "Rexcfnghk.MarkSixParser.Tests/*.fsproj"
+        -- "Rexcfnghk.MarkSixParser*.Tests/*.fsproj"
         |> MSBuildRelease buildDir "Build"
         |> Log "Runner built"
 )
 
 Target "BuildTests" (fun _ ->
-    !! "Rexcfnghk.MarkSixParser.Tests/*.fsproj"
+    !! "Rexcfnghk.MarkSixParser*.Tests/*.fsproj"
         |> MSBuildDebug testDir "Build"
         |> Log "Tests built")
         
@@ -38,11 +38,14 @@ Target "RunTests" (fun _ ->
 Target "OpenCover" (fun _ ->
     let configStartProcessInfoF (info: ProcessStartInfo) =
         let xunitExePath = packageDir @@ "xunit.runner.console/tools/xunit.console.exe"
-        let filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser.Tests]*"
-        let targetArgs = testDir @@ "Rexcfnghk.MarkSixParser.Tests.dll -noshadow"
+        let filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser*.Tests]*"
+        let targetArgs = 
+            ["Rexcfnghk.MarkSixParser.Tests.dll"; "Rexcfnghk.MarkSixParser.Runner.Tests.dll"]
+            |> List.map ((@@) testDir)
+            |> String.concat " "
         info.FileName <- packageDir @@ "OpenCover/tools/OpenCover.Console.exe"
         info.Arguments <- 
-            sprintf """-target:"%s" -targetargs:"%s" -output:"%s" -filter:"%s" %s"""
+            sprintf """-target:"%s" -targetargs:"%s -noshadow" -output:"%s" -filter:"%s" %s"""
                 xunitExePath targetArgs openCoverResultsXmlPath filter (if hasBuildParam "travis" then String.Empty else "-register:user")
                 
     let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 5.)

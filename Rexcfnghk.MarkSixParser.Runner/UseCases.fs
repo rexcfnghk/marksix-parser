@@ -1,46 +1,44 @@
-﻿module Rexcfnghk.MarkSixParser.UseCases
+﻿module Rexcfnghk.MarkSixParser.Runner.UseCases
 
-open System
 open Rexcfnghk.MarkSixParser
+open ErrorHandling
+open MarkSixNumberReader
 
-let tryGetInteger () = 
-    let validateInt32 string =
-        match Int32.TryParse string with
-        | true, i -> ValidationResult.success i
-        | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
+let private addOne = (+) 1
 
-    ValidationResult.retryable (printfn "%A") (stdin.ReadLine >> validateInt32)
+let markSixNumberReader _ =
+    readMarkSixNumber ()
 
-let getDrawResultNumbers' () = MarkSix.getDrawResultNumbers (printfn "%A") tryGetInteger
+let getDrawResultNumbers' () =
+    printfn "Enter draw results"
+    getDrawResultNumbers markSixNumberReader (printfn "The draw results are %A")
 
-let getMultipleUsersDraw () =
-    let rec getUsersDrawNumbers' decision acc i =
-        if decision = "n" || decision = "N"
-        then List.rev acc
-        else
-            let newCount = i + 1
-            printfn "Enter user's #%i draw" newCount
-            let usersDraw = MarkSix.getUsersDrawNumber (printfn "%A") tryGetInteger
-            printfn "Continue entering user's draw #%i [YyNn]?" (newCount + 1)
-            let decision = stdin.ReadLine()
-            getUsersDrawNumbers' decision (usersDraw :: acc) newCount
+let getUsersDrawNumbers' () =
+    getUsersDrawNumbers markSixNumberReader (printfn "User's draw is %A")
 
-    let printUsersDrawList =
-        let rec printUsersDrawListImpl acc = function
-            | [] -> printfn "You entered %i user's draw(s)" acc
-            | h :: t -> 
-                let newCount = acc + 1
-                printfn "User's draw #%i: %A" newCount h
-                printUsersDrawListImpl newCount t
-        printUsersDrawListImpl 0
+let getMultipleUsersDraw' () =
+    printfn "Enter users draw(s)"
 
-    let usersDrawList = getUsersDrawNumbers' "Y" [] 0
-    printUsersDrawList usersDrawList
-    usersDrawList
+    let printUsersDrawLength list = 
+        list |> (List.length >> printfn "You entered %i user's draw(s)")
+        list
+
+    let printUsersDrawElements = List.iteri (addOne >> printfn "User's draw #%i: %A")
+
+    let decisionPrompt () = 
+        stdin.ReadLine 
+        >> char
+        >> Decision.toResult
+        |> ValidationResult.retryable defaultErrorHandler
+
+    getMultipleUsersDraw 
+        (fun _ -> getUsersDrawNumbers' ())
+        (printUsersDrawLength >> printUsersDrawElements)
+        (fun _ -> decisionPrompt ())
 
 let checkMultipleResults =
-    MarkSix.checkResults (printfn "%A") >> ValidationResult.traverse
+    MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse
 
 let printPrizes = function
-    | Success l -> List.iteri (fun i -> printfn "Your prize for draw #%i is %A" (i + 1)) l
+    | Success l -> List.iteri (addOne >> printfn "Your prize for draw #%i is %A") l
     | Error e -> printfn "%A" e
