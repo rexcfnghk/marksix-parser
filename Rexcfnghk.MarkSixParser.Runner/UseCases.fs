@@ -7,7 +7,7 @@ open MarkSixNumberReader
 let private addOne = (+) 1
 
 let markSixNumberReader _ =
-    readMarkSixNumber ()
+    readMarkSixNumber stdin.ReadLine ()
 
 let getDrawResultNumbers' () =
     printfn "Enter draw results"

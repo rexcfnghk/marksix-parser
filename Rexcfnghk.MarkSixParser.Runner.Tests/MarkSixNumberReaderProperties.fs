@@ -23,6 +23,34 @@ let usersDrawArb =
     |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
 
 [<Property>]
+let ``Valid string can be read by readMarkSixNumber`` () =
+    let stringArb =
+        Gen.elements [1..49]
+        |> Gen.map (sprintf "%i")
+        |> Arb.fromGen
+
+    Prop.forAll stringArb <| fun s -> 
+        let reader () = s
+        let result = MarkSixNumberReader.readMarkSixNumber reader ()
+        test <@ match result with Success _ -> true | Error _ -> false @>
+
+[<Property>]
+let ``Invalid string returns error by readMarkSixNumber`` () =
+    let validStrings =
+        [1..49]
+        |> List.map (sprintf "%i")
+
+    let stringArb =
+        Arb.generate<string>
+        |> Gen.suchThat (fun s -> not (List.contains s validStrings))
+        |> Arb.fromGen
+
+    Prop.forAll stringArb <| fun s -> 
+        let reader () = s
+        let result = MarkSixNumberReader.readMarkSixNumber reader ()
+        test <@ match result with Success _ -> false | Error _ -> true @>
+
+[<Property>]
 let ``getMultipleUsersDraw can accept multiple users draws`` (NonNegativeInt size) =
     size > 0 ==> lazy
     

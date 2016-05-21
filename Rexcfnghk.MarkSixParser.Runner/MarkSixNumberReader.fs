@@ -6,13 +6,13 @@ open Rexcfnghk.MarkSixParser.ValidationResult
 open Rexcfnghk.MarkSixParser.Runner.Decision
 open ErrorHandling
 
-let readMarkSixNumber = 
+let readMarkSixNumber reader = 
     let validateInt32 string =
         match Int32.TryParse string with
         | true, i -> ValidationResult.success i
         | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
 
-    stdin.ReadLine >> validateInt32 >=> MarkSixNumber.create
+    reader >> validateInt32 >=> MarkSixNumber.create
 
 let rec private getDrawNumbers maxCount acc markSixNumberReader  =
     let tryAddToSet acc element =
