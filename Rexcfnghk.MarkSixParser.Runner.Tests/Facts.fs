@@ -68,7 +68,9 @@ let ``getMultipleUsersDraw can accept multiple UsersDraw list`` () =
             [| 3; 4; 24; 28; 30; 32 |]
             [| 1; 2; 3; 4; 5; 6 |] 
         |]
-        |> Array.map (Array.map (MarkSixNumber.create >> ValidationResult.extract) >> Set.ofArray >> MarkSix.toUsersDraw)
+        |> Array.map (Array.map (MarkSixNumber.create >> ValidationResult.extract) 
+                        >> Set.ofArray
+                        >> MarkSix.toUsersDraw)
 
     let decisions = [| 'Y'; 'N' |]
 
