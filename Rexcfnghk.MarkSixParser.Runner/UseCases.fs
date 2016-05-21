@@ -11,7 +11,10 @@ let markSixNumberReader _ =
 
 let getDrawResultNumbers' () =
     printfn "Enter draw results"
-    getDrawResultNumbers markSixNumberReader (printfn "The draw results are %A")
+    let drawResults = getDrawResultNumbers markSixNumberReader
+
+    printfn "The draw results are %A" drawResults
+    drawResults
 
 let getUsersDrawNumbers' () =
     getUsersDrawNumbers markSixNumberReader (printfn "User's draw is %A")

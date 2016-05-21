@@ -14,7 +14,7 @@ let ``getDrawNumbers accepts markSixNumberReader parameter`` () =
         [| 6; 7; 12; 15; 27; 36; 29 |]
         |> Array.map (MarkSixNumber.create)
 
-    let drawResults = getDrawResultNumbers (Array.get m6Numbers) ignore
+    let drawResults = getDrawResultNumbers (Array.get m6Numbers)
 
     let (DrawResults (DrawnNumber m1, DrawnNumber m2, DrawnNumber m3, 
                     DrawnNumber m4, DrawnNumber m5, DrawnNumber m6, ExtraNumber e)) = drawResults

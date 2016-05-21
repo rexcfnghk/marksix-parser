@@ -35,7 +35,7 @@ let rec private getDrawNumbers maxCount acc markSixNumberReader  =
 let getSixMarkSixNumbers =
     getDrawNumbers 6 Set.empty 
 
-let getDrawResultNumbers markSixNumberReader postEnterPrompt = 
+let getDrawResultNumbers markSixNumberReader = 
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
         then DuplicateErrorMessage |> ValidationResult.errorFromString
@@ -48,12 +48,9 @@ let getDrawResultNumbers markSixNumberReader postEnterPrompt =
         >=> tryReturnExtraNumber drawnNumbers
         |> ValidationResult.retryable defaultErrorHandler
 
-    let drawResults = 
-        (drawnNumbers, extraNumber)
-        |> MarkSix.toDrawResults
-        |> ValidationResult.extract
-    postEnterPrompt drawResults
-    drawResults
+    (drawnNumbers, extraNumber)
+    |> MarkSix.toDrawResults
+    |> ValidationResult.extract
 
 let getUsersDrawNumbers markSixNumberReader postEnterPrompt =
     let usersDraw =
