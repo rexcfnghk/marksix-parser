@@ -1,8 +1,10 @@
 ﻿module Rexcfnghk.MarkSixParser.Runner.UseCases
 
 open Rexcfnghk.MarkSixParser
+open CharConversion
 open ErrorHandling
 open MarkSixNumberReader
+open ValidationResult
 
 let private addOne = (+) 1
 
@@ -18,7 +20,7 @@ let getDrawResultNumbers' () =
 
 let getUsersDrawNumbers' () =
     let usersDraw = getUsersDrawNumbers markSixNumberReader
-    printfn "User's draw is %A" usersDraw
+    printfn "User's draw is %A. Continue entering next one? [YyNn]" usersDraw
     usersDraw
 
 let getMultipleUsersDraw' () =
@@ -32,8 +34,8 @@ let getMultipleUsersDraw' () =
 
     let decisionPrompt () = 
         stdin.ReadLine 
-        >> char
-        >> Decision.toResult
+        >> tryConvertToChar
+        >=> Decision.toResult
         |> ValidationResult.retryable defaultErrorHandler
 
     let usersDraw = 
