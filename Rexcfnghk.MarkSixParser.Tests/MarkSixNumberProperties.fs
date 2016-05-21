@@ -41,3 +41,14 @@ let ``x less than y infers MarkSixNumber<x> is less than MarkSixNumber<y>`` () =
     Prop.forAll xyGenerator <| fun (x, y) ->
         let m1, m2 = extract x, extract y
         m1 <! m2
+
+[<Property>]
+let ``Equal MarkSixNumbers have equal hash codes`` () =
+    let m6Arb =
+        Gen.constant 42
+        |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> Gen.two
+        |> Arb.fromGen
+
+    Prop.forAll m6Arb <| fun (x, y) ->
+        hash x =! hash y
