@@ -84,14 +84,10 @@ let checkResults errorHandler drawResults usersDraw =
         extractedUsersDraw |> allElementsAreUnique
 
     match usersDrawValidated, drawResultsValidated with
-    | Error e, Success _ | Success _, Error e -> 
+    | Error e, _ | _, Error e -> 
         errorHandler e
-        Error e
-    | Error e1, Error e2 ->
-        errorHandler e1
-        errorHandler e2
-        let (ErrorMessage m1, ErrorMessage m2) = e1, e2
-        m1 + m2 |> ValidationResult.errorFromString
+        let (ErrorMessage m) = e
+        ValidationResult.errorFromString m
     | Success usersDraw, Success drawResults -> 
         calculatePoints usersDraw (drawResults, extraNumber)
         |> Prize.fromPoints
