@@ -56,7 +56,7 @@
     <Compile Include="MarkSixNumberProperties.fs" />
     <Compile Include="PointsProperties.fs" />
     <Compile Include="Facts.fs" />
-    <Compile Include="ValidationResultFacts.fs" />
+    <Compile Include="ValidationResultTests.fs" />
     <Compile Include="PrintFProperties.fs" />
     <Content Include="paket.references" />
     <Content Include="App.config" />
