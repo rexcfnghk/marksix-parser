@@ -4,6 +4,7 @@ open FsCheck.Xunit
 open Xunit
 open Swensen.Unquote
 open Rexcfnghk.MarkSixParser
+open Rexcfnghk.MarkSixParser.ValidationResult
 
 [<Fact>]
 let ``retryable should be able to succeed eventually`` () =
@@ -28,3 +29,19 @@ let ``map identity gives back the original ValidationResult`` (intV: ValidationR
 let ``ErrorMessage can be wrapped and unwrapped`` s =
     let error = s |> ValidationResult.errorFromString
     test <@ match error with Success _ -> false | Error (ErrorMessage msg) -> msg = s @>
+
+[<Property>]
+let ``return and apply is the same as calling map`` (f: int -> int) x =
+    f
+    |> ValidationResult.success
+    <*> x
+    =! ValidationResult.map f x
+
+[<Property>]
+let ``All elements in list must be return success before traverse is successful`` (f: int -> ValidationResult<string>) list =
+    let allSuccess = function Success _ -> true | Error _ -> false
+
+    let result = ValidationResult.traverse f list
+    let isListAllSuccess = List.map f list |> List.forall allSuccess
+
+    test <@ match result with Success _ -> isListAllSuccess | Error _ -> not isListAllSuccess @>
