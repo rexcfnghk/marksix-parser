@@ -41,16 +41,3 @@ module ValidationResult =
     let extract<'a> : ValidationResult<'a> -> 'a = doubleMap id (fun (ErrorMessage e) -> invalidOp e)
 
     let (>=>) f g = f >> bind g
-
-    let apply fV xV =
-        match fV, xV with
-        | Success f, Success x -> Success (f x)
-        | Error e, _ | _, Error e -> Error e
-
-    let (<*>) = apply
-
-    // http://fsharpforfunandprofit.com/posts/elevated-world-4/#traverse
-    let traverse f list =
-        let cons h t = h :: t
-        let folder h t = cons <!> (f h) <*> t
-        List.foldBack folder list (Success [])

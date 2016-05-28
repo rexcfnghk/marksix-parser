@@ -4,5 +4,5 @@
 let DuplicateErrorMessage = 
     "Duplicate mark six number entered"
 
-let inline defaultErrorHandler<'a> : 'a -> unit = printfn "%A"
+let defaultErrorHandler<'a> : 'a -> unit = printfn "%A"
 
