@@ -4,13 +4,9 @@ open Rexcfnghk.MarkSixParser
 open System
 open System.Globalization
 
-let tryConvertToChar s =
-    try
-        s
-        |> StringInfo.GetNextTextElement
-        |> char
-        |> ValidationResult.success
-    with
-        | :? FormatException ->
-            "Input is not a valid character" 
-            |> ValidationResult.errorFromString
+let tryConvertToChar =
+    StringInfo.GetNextTextElement
+    >> Char.TryParse
+    >> function 
+        | true, c -> ValidationResult.success c
+        | false, _ -> ValidationResult.errorFromString "Input is not a valid character"
