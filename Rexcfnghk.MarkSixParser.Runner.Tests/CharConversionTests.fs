@@ -19,6 +19,16 @@ let ``tryConvertToChar converts successfully for one-character string`` () =
         let c = tryConvertToChar s
         test <@ match c with Success _ -> true | Error _ -> false @>
 
+[<Property>]
+let ``tryConvertToChar returns error for strings with length > 2 `` () =
+    let stringLengthLargerThan2Arb =
+        Arb.generate<string>
+        |> Gen.suchThat (fun s -> String.length s >= 2)
+        |> Arb.fromGen
+
+    Prop.forAll stringLengthLargerThan2Arb <| fun s ->
+        test <@ match tryConvertToChar s with Success _ -> false | Error _ -> true @>
+
 [<Fact>]
 let ``tryConvertToChar returns error for code points requiring two UTF-16 code units`` () =
     let input = "𤭢"
