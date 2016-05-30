@@ -10,14 +10,24 @@ open Rexcfnghk.MarkSixParser.Runner.CharConversion
 [<Property>]
 let ``tryConvertToChar converts successfully for one-character string`` () =
     let validStringArb = 
-        ['a'..'z']
-        |> Gen.elements
+        Arb.generate<char>
         |> Gen.map string
         |> Arb.fromGen
 
     Prop.forAll validStringArb <| fun s -> 
-        let c = tryConvertToChar s
-        test <@ match c with Success _ -> true | Error _ -> false @>
+        let cV = tryConvertToChar s
+        test <@ match cV with Success _ -> true | Error _ -> false @>
+
+[<Property>]
+let ``tryConvertToChar returns the same char from the one-character string`` () =
+    let validStringArb = 
+        Arb.generate<char>
+        |> Gen.map string
+        |> Arb.fromGen
+
+    Prop.forAll validStringArb <| fun s -> 
+        let cV = tryConvertToChar s
+        test <@ match cV with Success c -> sprintf "%c" c = s | Error _ -> false @>
 
 [<Property>]
 let ``tryConvertToChar returns error for strings with length > 2 `` () =
