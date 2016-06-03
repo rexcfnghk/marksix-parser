@@ -34,7 +34,7 @@ let invalidLengthUsersDrawArb =
     |> Gen.listOf
     |> Gen.suchThat (fun l -> List.length l <> 6)
     |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s <> 6)
+    |> Gen.suchThat (fun s -> Set.count s < 6)
     |> Arb.fromGen
 
 let invalidLengthDrawResultsArb =
@@ -49,9 +49,8 @@ let invalidLengthDrawResultsArb =
 [<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
-    let (UsersDraw (m1, m2, m3, m4, m5, m6)) = MarkSix.randomUsersDraw ()
-    let numbers = [m1; m2; m3; m4; m5; m6]
-    List.forall (MarkSixNumber.value >> isWithinRange) numbers
+    let (UsersDraw s) = MarkSix.randomUsersDraw ()
+    Set.forall (MarkSixNumber.value >> isWithinRange) s
 
 [<Property>]
 let ``toUsersDraw fails when given set length not equals to six`` () =
@@ -91,8 +90,8 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
                 |> ValidationResult.extract
 
             let extractedUsersDraw =
-                let (UsersDraw (n1, n2, n3, n4, n5, n6)) = usersDraw
-                [n1; n2; n3; n4; n5; n6]
+                let (UsersDraw s) = usersDraw
+                Set.toList s
 
             let expected = 
                 calculatePoints extractedUsersDraw (drawResultsSet, extraNumber)

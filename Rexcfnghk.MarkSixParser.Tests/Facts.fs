@@ -21,8 +21,8 @@ let ``checkResults returns error when drawResult contains duplicate`` () =
         [1..6]
         |> List.map (MarkSixNumber.create >> ValidationResult.extract)
         |> function
-            | [m1; m2; m3; m4; m5; m6] ->
-                UsersDraw (m1, m2, m3, m4, m5, m6)
+            | [_; _; _; _; _; _] as l ->
+                l |> Set.ofList |> UsersDraw
             | _ -> failwith "Not expected to be here"
 
     let validationResult = MarkSix.checkResults ignore drawResults usersDraw
@@ -118,19 +118,16 @@ let ``getDrawResults respects order of entering`` () =
 [<Fact>]
 let ``getUsersDrawNumbers respects order of entering`` () =
     let createMarkSixNumber = MarkSixNumber.create >> ValidationResult.extract
-    let usersDraw = 
+    let originalUsersDraw = 
         [| 6; 7; 12; 15; 27; 36 |]
         |> Array.map createMarkSixNumber
         |> Set.ofArray
 
-    match MarkSix.toUsersDraw usersDraw with
+    match MarkSix.toUsersDraw originalUsersDraw with
     | Error (ErrorMessage e) -> failwith e
     | Success usersDraw -> 
-        let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
-        let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
-                                       MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
-     
-        [i1; i2; i3; i4; i5; i6] =! List.ofArray [| 6; 7; 12; 15; 27; 36 |]
+        let (UsersDraw s) = usersDraw
+        s =! originalUsersDraw
 
 [<Fact>]
 let ``getDrawResults accepts set of MarkSixNumbers`` () =
@@ -163,8 +160,5 @@ let ``getUsersDraw accepts set of MarkSixNumbers`` () =
     match MarkSix.toUsersDraw usersDrawNumbers with
     | Error (ErrorMessage e) -> failwith e
     | Success usersDraw ->
-        let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
-        let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
-                                       MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
-     
-        [i1; i2; i3; i4; i5; i6] =! [6; 7; 12; 15; 27; 36]
+        let (UsersDraw s) = usersDraw
+        s =! usersDrawNumbers

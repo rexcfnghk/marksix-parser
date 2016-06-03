@@ -38,11 +38,15 @@ let ``getUsersDraw accepts markSixNumberReader parameter`` () =
 
     let usersDraw = getUsersDrawNumbers (Array.get m6Numbers)
 
-    let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
-    let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
-                                    MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
+    let (UsersDraw s) = usersDraw
+    
+    match Set.toList s with
+    | [m1; m2; m3; m4; m5; m6] ->
+        let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                        MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
      
-    [| i1; i2; i3; i4; i5; i6 |] =! [| 3; 4; 24; 28; 30; 32 |]
+        [| i1; i2; i3; i4; i5; i6 |] =! [| 3; 4; 24; 28; 30; 32 |]
+    | _ -> failwith "Unexpected"
 
 [<Fact>]
 let ``getUsersDrawNumbers can accept convert UsersDraw list`` () =
@@ -51,15 +55,18 @@ let ``getUsersDrawNumbers can accept convert UsersDraw list`` () =
         [| 1; 2; 3; 4; 5; 6 |] ]
     let list = List.map (Array.map MarkSixNumber.create) m6NumberList
 
-    let usersDrawList = List.map (fun arr -> getUsersDrawNumbers (Array.get arr)) list
+    let usersDrawList = List.map (Array.get >> getUsersDrawNumbers) list
 
     test <@ List.forall2 (fun usersDraw m6Number ->
-        let (UsersDraw (m1, m2, m3, m4, m5, m6)) = usersDraw
-        let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
-                                        MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
+                let (UsersDraw s) = usersDraw
+                match Set.toList s with
+                | [m1; m2; m3; m4; m5; m6] ->
+                    let i1, i2, i3, i4, i5, i6 = MarkSixNumber.value m1, MarkSixNumber.value m2, MarkSixNumber.value m3, 
+                                                    MarkSixNumber.value m4, MarkSixNumber.value m5, MarkSixNumber.value m6
      
-        [| i1; i2; i3; i4; i5; i6 |] = m6Number)
-    usersDrawList m6NumberList @>
+                    [| i1; i2; i3; i4; i5; i6 |] = m6Number
+                | _ -> failwith "Unexpected")
+                usersDrawList m6NumberList @>
 
 [<Fact>]
 let ``getMultipleUsersDraw can accept multiple UsersDraw list`` () =

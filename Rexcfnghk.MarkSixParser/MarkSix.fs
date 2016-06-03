@@ -5,12 +5,10 @@ open Models
 open ValidationResult
 
 let toUsersDraw usersDrawSet =
-    match Set.toList usersDrawSet with
-    | [m1; m2; m3; m4; m5; m6] ->
-        (m1, m2, m3, m4, m5, m6)
-        |> (UsersDraw >> Success)
-    | _ -> 
-        "Users draw expects a list of six MarkSixNumbers"
+    if Set.count usersDrawSet >= 6
+    then usersDrawSet |> UsersDraw |> Success
+    else 
+        "Users draw expects a list of at least six MarkSixNumbers"
         |> ValidationResult.errorFromString
 
 let toDrawResults (drawnNumberSet, extraNumber) =
@@ -74,8 +72,8 @@ let checkResults errorHandler drawResults usersDraw =
         [n1; n2; n3; n4; n5; n6], e
 
     let extractedUsersDraw =
-        let (UsersDraw (n1, n2, n3, n4, n5, n6)) = usersDraw
-        [n1; n2; n3; n4; n5; n6]
+        let (UsersDraw s) = usersDraw
+        Set.toList s
 
     let drawResults, extraNumber = extractedDrawResults
 

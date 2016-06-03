@@ -60,6 +60,7 @@
     <Compile Include="PrintFProperties.fs" />
     <Content Include="paket.references" />
     <Content Include="App.config" />
+    <Compile Include="UsersDrawTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
