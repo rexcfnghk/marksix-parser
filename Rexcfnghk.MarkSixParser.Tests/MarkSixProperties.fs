@@ -49,11 +49,23 @@ let invalidLengthDrawResultsArb =
 [<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
-    let (UsersDraw s) = MarkSix.randomUsersDraw ()
+    let (UsersDraw s) = MarkSix.defaultRandomUsersDraw ()
     Set.forall (MarkSixNumber.value >> isWithinRange) s
 
 [<Property>]
-let ``toUsersDraw fails when given set length not equals to six`` () =
+let ``drawRandom can generate UsersDraw when input count is between six and ten`` () =
+    let countArb =
+        Arb.generate<NonNegativeInt>
+        |> Gen.suchThat (fun (NonNegativeInt x) -> x >= 6 && x <= 10)
+        |> Gen.map (fun (NonNegativeInt x) -> x)
+        |> Arb.fromGen
+
+    Prop.forAll countArb <| fun count ->
+        let (UsersDraw usersDraw) = MarkSix.randomUsersDraw count
+        Set.count usersDraw =! count
+
+[<Property>]
+let ``toUsersDraw fails when given set length is less than six`` () =
     Prop.forAll invalidLengthUsersDrawArb <| fun l ->
         test <@ match MarkSix.toUsersDraw l with
                 | Error _ -> true
