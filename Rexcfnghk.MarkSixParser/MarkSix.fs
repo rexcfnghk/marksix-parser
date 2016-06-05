@@ -22,9 +22,7 @@ let toDrawResults (drawnNumberSet, extraNumber) =
         "drawResults expects a list of six MarkSixNumbers and one ExtraNumber"
         |> ValidationResult.errorFromString
 
-let randomUsersDraw count =
-    let r = Random()
-
+let randomUsersDraw count (r: Random) =
     let rec randomUsersDrawImpl acc =
         if Set.count acc = count
         then acc
@@ -40,7 +38,7 @@ let randomUsersDraw count =
     |> toUsersDraw
     |> ValidationResult.extract
 
-let defaultRandomUsersDraw () = randomUsersDraw 6
+let defaultRandomUsersDraw r = randomUsersDraw 6 r
 
 let checkResults errorHandler drawResults usersDraw =
     let allElementsAreUnique list =

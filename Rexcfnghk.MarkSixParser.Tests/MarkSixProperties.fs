@@ -5,6 +5,7 @@ open Models
 open FsCheck
 open FsCheck.Xunit
 open Swensen.Unquote
+open System
 
 let markSixNumberGen =
     Gen.elements [1..49]
@@ -49,7 +50,8 @@ let invalidLengthDrawResultsArb =
 [<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
-    let (UsersDraw s) = MarkSix.defaultRandomUsersDraw ()
+    let r = Random ()
+    let (UsersDraw s) = MarkSix.defaultRandomUsersDraw r
     Set.forall (MarkSixNumber.value >> isWithinRange) s
 
 [<Property>]
@@ -61,7 +63,7 @@ let ``drawRandom can generate UsersDraw when input count is between six and ten`
         |> Arb.fromGen
 
     Prop.forAll countArb <| fun count ->
-        let (UsersDraw usersDraw) = MarkSix.randomUsersDraw count
+        let (UsersDraw usersDraw) = MarkSix.randomUsersDraw count (Random ())
         Set.count usersDraw =! count
 
 [<Property>]
