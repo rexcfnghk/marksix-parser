@@ -116,3 +116,21 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
                 |> ValidationResult.extract
 
             actual =! expected
+
+[<Property>]
+let ``checkResults should fail for usersDraw with less than six elements`` () =
+    Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
+        Prop.forAll invalidLengthUsersDrawArb <| fun usersDrawSet ->
+            let drawResults = 
+                (drawResultsSet, extraNumber)
+                |> MarkSix.toDrawResults
+                |> ValidationResult.extract
+
+            let usersDraw = 
+                usersDrawSet
+                |> UsersDraw
+
+            test <@ match MarkSix.checkResults ignore drawResults usersDraw with 
+                    | Success _ -> false 
+                    | Error _ -> true @>
+        

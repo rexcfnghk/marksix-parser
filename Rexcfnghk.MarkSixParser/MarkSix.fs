@@ -68,15 +68,24 @@ let checkResults errorHandler drawResults usersDraw =
         then ValidationResult.success (drawResultsSet, e)
         else "Input draw results contain dupcliate" |> ValidationResult.errorFromString
 
-    let drawResultsV = extractDrawResults drawResults
-    let (UsersDraw usersDraw) = usersDraw
+    let extractUsersDraw usersDraw =
+        let (UsersDraw set) = usersDraw
 
-    match drawResultsV with
-    | Error e -> 
+        if Set.count set >= 6
+        then ValidationResult.success set
+        else 
+            "Users Draw must contain at least six elements" 
+            |> ValidationResult.errorFromString
+
+    let drawResultsV = extractDrawResults drawResults
+    let usersDrawV = extractUsersDraw usersDraw
+
+    match drawResultsV, usersDrawV with
+    | Error e, _ | _, Error e -> 
         errorHandler e
         let (ErrorMessage m) = e
         ValidationResult.errorFromString m
-    | Success (drawResults, extraNumber) -> 
+    | Success (drawResults, extraNumber), Success usersDraw -> 
         calculatePoints usersDraw (drawResults, extraNumber)
         |> Prize.fromPoints
         |> ValidationResult.success
