@@ -41,52 +41,42 @@ let randomUsersDraw count (r: Random) =
 let defaultRandomUsersDraw r = randomUsersDraw 6 r
 
 let checkResults errorHandler drawResults usersDraw =
-    let allElementsAreUnique list =
-        let set = Set.ofList list
-        if Set.count set = List.length list
-        then Success list
-        else "There are duplicates in draw result list" |> ValidationResult.errorFromString
-
-    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
-        let usersDrawSet, drawResultWithoutExtraNumberSet =
-            Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber
-        
+    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =      
         let points = 
-            (usersDrawSet, drawResultWithoutExtraNumberSet)
+            (usersDraw, drawResultWithoutExtraNumber)
             ||> Set.intersect
             |> Set.count
             |> decimal
 
         let extraPoints = 
-            if Set.contains extraNumber usersDrawSet
+            if Set.contains extraNumber usersDraw
             then 0.5m 
             else 0.m
 
         points + extraPoints |> Points
 
-    let extractedDrawResults =
+    let extractDrawResults drawResults =
         let (DrawResults (
                 DrawnNumber n1, DrawnNumber n2, DrawnNumber n3, 
                 DrawnNumber n4, DrawnNumber n5, DrawnNumber n6, 
                 ExtraNumber e)) = drawResults
-        [n1; n2; n3; n4; n5; n6], e
 
-    let extractedUsersDraw =
-        let (UsersDraw s) = usersDraw
-        Set.toList s
+        let drawResultsWithoutExtraNumber = [| n1; n2; n3; n4; n5; n6 |]
+        let drawResultsSet = drawResultsWithoutExtraNumber |> Set.ofArray
 
-    let drawResults, extraNumber = extractedDrawResults
+        if Array.length drawResultsWithoutExtraNumber = Set.count drawResultsSet
+        then ValidationResult.success (drawResultsSet, e)
+        else "Input draw results contain dupcliate" |> ValidationResult.errorFromString
 
-    let drawResultsValidated, usersDrawValidated =
-        drawResults |> allElementsAreUnique,
-        extractedUsersDraw |> allElementsAreUnique
+    let drawResultsV = extractDrawResults drawResults
+    let (UsersDraw usersDraw) = usersDraw
 
-    match usersDrawValidated, drawResultsValidated with
-    | Error e, _ | _, Error e -> 
+    match drawResultsV with
+    | Error e -> 
         errorHandler e
         let (ErrorMessage m) = e
         ValidationResult.errorFromString m
-    | Success usersDraw, Success drawResults -> 
+    | Success (drawResults, extraNumber) -> 
         calculatePoints usersDraw (drawResults, extraNumber)
         |> Prize.fromPoints
         |> ValidationResult.success
