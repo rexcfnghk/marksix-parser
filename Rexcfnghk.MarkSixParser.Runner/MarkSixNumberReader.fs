@@ -32,16 +32,13 @@ let rec private getDrawNumbers maxCount acc markSixNumberReader  =
             ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
         getDrawNumbers maxCount updatedSet markSixNumberReader 
 
-let getSixMarkSixNumbers =
-    getDrawNumbers 6 Set.empty 
-
 let getDrawResultNumbers markSixNumberReader = 
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
         then DuplicateErrorMessage |> ValidationResult.errorFromString
         else element |> ValidationResult.success
 
-    let drawnNumbers = getSixMarkSixNumbers markSixNumberReader
+    let drawnNumbers = getDrawNumbers 6 Set.empty markSixNumberReader
     let extraNumber = 
         let index = 6
         (fun () -> markSixNumberReader index)
@@ -52,8 +49,8 @@ let getDrawResultNumbers markSixNumberReader =
     |> MarkSix.toDrawResults
     |> ValidationResult.extract
 
-let getUsersDrawNumbers =
-    getSixMarkSixNumbers
+let getUsersDrawNumbers n =
+    getDrawNumbers n Set.empty
     >> MarkSix.toUsersDraw
     >> ValidationResult.extract
             

@@ -36,7 +36,7 @@ let ``getUsersDraw accepts markSixNumberReader parameter`` () =
         [| 3; 4; 24; 28; 30; 32 |]
         |> Array.map (MarkSixNumber.create)
 
-    let usersDraw = getUsersDrawNumbers (Array.get m6Numbers)
+    let usersDraw = getUsersDrawNumbers 6 (Array.get m6Numbers)
 
     let (UsersDraw s) = usersDraw
     
@@ -55,7 +55,7 @@ let ``getUsersDrawNumbers can accept convert UsersDraw list`` () =
         [| 1; 2; 3; 4; 5; 6 |] ]
     let list = List.map (Array.map MarkSixNumber.create) m6NumberList
 
-    let usersDrawList = List.map (Array.get >> getUsersDrawNumbers) list
+    let usersDrawList = List.map (Array.get >> getUsersDrawNumbers 6) list
 
     test <@ List.forall2 (fun usersDraw m6Number ->
                 let (UsersDraw s) = usersDraw
