@@ -8,7 +8,7 @@ open System
 
 let outOfRangeArb =
     Arb.Default.Int32().Generator
-    |> Gen.suchThat (fun i -> i < 1 || i > 49)
+    |> Gen.filter (fun i -> i < 1 || i > 49)
     |> Arb.fromGen
 
 let markSixNumberGen =
@@ -35,7 +35,7 @@ let ``x less than y infers MarkSixNumber<x> is less than MarkSixNumber<y>`` () =
     let xyGenerator =
         Gen.elements [1..49]
         |> Gen.two
-        |> Gen.suchThat (fun (x, y) -> x < y)
+        |> Gen.filter (fun (x, y) -> x < y)
         |> Arb.fromGen
     let extract = MarkSixNumber.create >> ValidationResult.extract
     Prop.forAll xyGenerator <| fun (x, y) ->

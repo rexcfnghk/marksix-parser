@@ -19,9 +19,9 @@ let ``combination should return correct number of combinations for arrays more t
 
     let arrayArb =
         Arb.generate<int>
-        |> Gen.suchThat (fun x -> x > 0)
+        |> Gen.filter (fun x -> x > 0)
         |> Gen.arrayOf
-        |> Gen.suchThat (fun arr -> Array.length arr > 6 && Array.length arr <= 10)
+        |> Gen.filter (fun arr -> Array.length arr > 6 && Array.length arr <= 10)
         |> Arb.fromGen
 
     Prop.forAll arrayArb <| fun arr -> 

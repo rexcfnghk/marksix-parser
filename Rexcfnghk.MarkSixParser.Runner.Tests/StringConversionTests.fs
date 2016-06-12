@@ -33,7 +33,7 @@ let ``tryConvertToChar returns the same char from the one-character string`` () 
 let ``tryConvertToChar returns error for strings with length > 2 `` () =
     let stringLengthLargerThan2Arb =
         Arb.generate<string>
-        |> Gen.suchThat (fun s -> String.length s >= 2)
+        |> Gen.filter (fun s -> String.length s >= 2)
         |> Arb.fromGen
 
     Prop.forAll stringLengthLargerThan2Arb <| fun s ->
@@ -43,7 +43,7 @@ let ``tryConvertToChar returns error for strings with length > 2 `` () =
 let ``tryConvertToUsersDrawCount converts successfully for valid strings`` () =
     let validStringArb =
         Arb.generate<int>
-        |> Gen.suchThat (fun x -> x >= 6)
+        |> Gen.filter (fun x -> x >= 6)
         |> Gen.map (sprintf "%i")
         |> Arb.fromGen
 
@@ -54,7 +54,7 @@ let ``tryConvertToUsersDrawCount converts successfully for valid strings`` () =
 let ``tryConvertToUsersDrawCount fails for ints less than six`` () =
     let invalidStringArb =
         Arb.generate<int>
-        |> Gen.suchThat (fun x -> x < 6)
+        |> Gen.filter (fun x -> x < 6)
         |> Gen.map (sprintf "%i")
         |> Arb.fromGen
 

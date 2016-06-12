@@ -12,7 +12,7 @@ let validCharPatternArb =
 
 let invalidCharPatternArb =
     Arb.generate<char>
-    |> Gen.suchThat (fun c -> not <| List.contains c ['Y'; 'y'; 'N'; 'n'])
+    |> Gen.filter (fun c -> not <| List.contains c ['Y'; 'y'; 'N'; 'n'])
     |> Arb.fromGen
 
 [<Property>]

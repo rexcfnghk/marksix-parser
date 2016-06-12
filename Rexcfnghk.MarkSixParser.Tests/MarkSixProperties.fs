@@ -17,7 +17,7 @@ let markSixNumberSetGen count =
     markSixNumberGen
     |> Gen.listOfLength count
     |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s >= count)
+    |> Gen.filter (fun s -> Set.count s >= count)
     |> Gen.map (Seq.take count >> Set.ofSeq)
 
 let usersDrawArb = 
@@ -33,17 +33,17 @@ let drawResultsArb =
 let invalidLengthUsersDrawArb =
     markSixNumberGen
     |> Gen.listOf
-    |> Gen.suchThat (fun l -> List.length l <> 6)
+    |> Gen.filter (fun l -> List.length l <> 6)
     |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s < 6)
+    |> Gen.filter (fun s -> Set.count s < 6)
     |> Arb.fromGen
 
 let invalidLengthDrawResultsArb =
     markSixNumberGen
     |> Gen.listOf
-    |> Gen.suchThat (fun l -> List.length l >= 2 && List.length l <> 7)
+    |> Gen.filter (fun l -> List.length l >= 2 && List.length l <> 7)
     |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s >= 2 && Set.count s <> 7)
+    |> Gen.filter (fun s -> Set.count s >= 2 && Set.count s <> 7)
     |> Gen.map (Set.toList >> function [] -> failwith "unexpected" | h :: t -> Set.ofList t, h)
     |> Arb.fromGen
 
@@ -58,7 +58,7 @@ let ``drawRandom always returns numbers between 1 and 49`` () =
 let ``drawRandom can generate UsersDraw when input count is between six and ten`` () =
     let countArb =
         Arb.generate<NonNegativeInt>
-        |> Gen.suchThat (fun (NonNegativeInt x) -> x >= 6 && x <= 10)
+        |> Gen.filter (fun (NonNegativeInt x) -> x >= 6 && x <= 10)
         |> Gen.map (fun (NonNegativeInt x) -> x)
         |> Arb.fromGen
 

@@ -15,7 +15,7 @@ let markSixNumberSetGen count =
     m6Gen
     |> Gen.listOfLength count
     |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s >= count)
+    |> Gen.filter (fun s -> Set.count s >= count)
     |> Gen.map (Seq.take count >> Set.ofSeq)
 
 let usersDrawArb = 
@@ -42,7 +42,7 @@ let ``Invalid string returns error by readMarkSixNumber`` () =
 
     let stringArb =
         Arb.generate<string>
-        |> Gen.suchThat (fun s -> not (List.contains s validStrings))
+        |> Gen.filter (fun s -> not (List.contains s validStrings))
         |> Arb.fromGen
 
     Prop.forAll stringArb <| fun s -> 
