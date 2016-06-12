@@ -5,6 +5,8 @@ open StringConversion
 open ErrorHandling
 open MarkSixNumberReader
 open ValidationResult
+open Combinations
+open Models
 
 let private addOne = (+) 1
 
@@ -20,7 +22,7 @@ let getDrawResultNumbers' () =
     printfn "Enter draw results"
     let drawResults = getDrawResultNumbers markSixNumberReader
 
-    printfn "The draw results are %A" drawResults
+    printfn "The draw results are %A\n" drawResults
     drawResults
 
 let getUsersDrawNumbers' () =
@@ -56,10 +58,18 @@ let getMultipleUsersDraw' () =
     usersDraw
     |> (printUsersDrawLength >> printUsersDrawElements)
 
+    printf "\n"
     usersDraw
 
-let checkMultipleResults =
-    MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse
+let checkMultipleResults drawResults usersDrawList =
+    let combinations =
+        usersDrawList
+        |> List.map (fun (UsersDraw u) -> u |> Set.toArray |> combination 6)
+        |> List.collect id
+        |> List.map (Set.ofList >> UsersDraw)
+
+    MarkSix.checkResults defaultErrorHandler drawResults
+    |> ValidationResult.traverse <| combinations
 
 let printPrizes = function
     | Success l -> List.iteri (addOne >> printfn "Your prize for draw #%i is %A") l

@@ -52,6 +52,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Combinations.fs" />
     <Compile Include="Validations.fs" />
     <Compile Include="MarkSixNumber.fsi" />
     <Compile Include="MarkSixNumber.fs" />
