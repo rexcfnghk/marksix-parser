@@ -5,6 +5,7 @@ open Models
 open FsCheck
 open FsCheck.Xunit
 open Swensen.Unquote
+open System
 
 let markSixNumberGen =
     Gen.elements [1..49]
@@ -34,7 +35,7 @@ let invalidLengthUsersDrawArb =
     |> Gen.listOf
     |> Gen.suchThat (fun l -> List.length l <> 6)
     |> Gen.map Set.ofList
-    |> Gen.suchThat (fun s -> Set.count s <> 6)
+    |> Gen.suchThat (fun s -> Set.count s < 6)
     |> Arb.fromGen
 
 let invalidLengthDrawResultsArb =
@@ -49,12 +50,24 @@ let invalidLengthDrawResultsArb =
 [<Property>]
 let ``drawRandom always returns numbers between 1 and 49`` () =
     let isWithinRange x = x >= 1 && x <= 49
-    let (UsersDraw (m1, m2, m3, m4, m5, m6)) = MarkSix.randomUsersDraw ()
-    let numbers = [m1; m2; m3; m4; m5; m6]
-    List.forall (MarkSixNumber.value >> isWithinRange) numbers
+    let r = Random ()
+    let (UsersDraw s) = MarkSix.defaultRandomUsersDraw r
+    Set.forall (MarkSixNumber.value >> isWithinRange) s
 
 [<Property>]
-let ``toUsersDraw fails when given set length not equals to six`` () =
+let ``drawRandom can generate UsersDraw when input count is between six and ten`` () =
+    let countArb =
+        Arb.generate<NonNegativeInt>
+        |> Gen.suchThat (fun (NonNegativeInt x) -> x >= 6 && x <= 10)
+        |> Gen.map (fun (NonNegativeInt x) -> x)
+        |> Arb.fromGen
+
+    Prop.forAll countArb <| fun count ->
+        let (UsersDraw usersDraw) = MarkSix.randomUsersDraw count (Random ())
+        Set.count usersDraw =! count
+
+[<Property>]
+let ``toUsersDraw fails when given set length is less than six`` () =
     Prop.forAll invalidLengthUsersDrawArb <| fun l ->
         test <@ match MarkSix.toUsersDraw l with
                 | Error _ -> true
@@ -91,8 +104,8 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
                 |> ValidationResult.extract
 
             let extractedUsersDraw =
-                let (UsersDraw (n1, n2, n3, n4, n5, n6)) = usersDraw
-                [n1; n2; n3; n4; n5; n6]
+                let (UsersDraw s) = usersDraw
+                Set.toList s
 
             let expected = 
                 calculatePoints extractedUsersDraw (drawResultsSet, extraNumber)
@@ -103,3 +116,21 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
                 |> ValidationResult.extract
 
             actual =! expected
+
+[<Property>]
+let ``checkResults should fail for usersDraw with less than six elements`` () =
+    Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
+        Prop.forAll invalidLengthUsersDrawArb <| fun usersDrawSet ->
+            let drawResults = 
+                (drawResultsSet, extraNumber)
+                |> MarkSix.toDrawResults
+                |> ValidationResult.extract
+
+            let usersDraw = 
+                usersDrawSet
+                |> UsersDraw
+
+            test <@ match MarkSix.checkResults ignore drawResults usersDraw with 
+                    | Success _ -> false 
+                    | Error _ -> true @>
+        

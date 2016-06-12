@@ -60,7 +60,7 @@
     <Compile Include="Decision.fs" />
     <Compile Include="ErrorHandling.fs" />
     <Compile Include="MarkSixNumberReader.fs" />
-    <Compile Include="CharConversion.fs" />
+    <Compile Include="StringConversion.fs" />
     <Compile Include="UseCases.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

@@ -58,8 +58,11 @@
     <Compile Include="Facts.fs" />
     <Compile Include="ValidationResultTests.fs" />
     <Compile Include="PrintFProperties.fs" />
+    <Compile Include="UsersDrawTests.fs" />
+    <Compile Include="PrizeProperties.fs" />
     <Content Include="paket.references" />
     <Content Include="App.config" />
+    <Compile Include="CombinationTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

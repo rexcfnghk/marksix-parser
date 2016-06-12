@@ -1,25 +1,37 @@
 ﻿module Rexcfnghk.MarkSixParser.Runner.UseCases
 
 open Rexcfnghk.MarkSixParser
-open CharConversion
+open StringConversion
 open ErrorHandling
 open MarkSixNumberReader
 open ValidationResult
+open Combinations
+open Models
 
 let private addOne = (+) 1
 
 let markSixNumberReader _ =
     readMarkSixNumber stdin.ReadLine ()
 
+let getUsersDrawCount () =
+    stdin.ReadLine
+    >> tryConvertToUsersDrawCount
+    |> ValidationResult.retryable defaultErrorHandler
+
 let getDrawResultNumbers' () =
     printfn "Enter draw results"
     let drawResults = getDrawResultNumbers markSixNumberReader
 
-    printfn "The draw results are %A" drawResults
+    printfn "The draw results are %A\n" drawResults
     drawResults
 
 let getUsersDrawNumbers' () =
-    let usersDraw = getUsersDrawNumbers markSixNumberReader
+    printfn "How many numbers does this user's draw contain?"
+    let usersDrawCount = getUsersDrawCount ()
+
+    printfn "Enter a user's draw of %i numbers" usersDrawCount
+    let usersDraw = getUsersDrawNumbers usersDrawCount markSixNumberReader
+
     printfn "User's draw is %A. Continue entering next one? [YyNn]" usersDraw
     usersDraw
 
@@ -46,10 +58,18 @@ let getMultipleUsersDraw' () =
     usersDraw
     |> (printUsersDrawLength >> printUsersDrawElements)
 
+    printf "\n"
     usersDraw
 
-let checkMultipleResults =
-    MarkSix.checkResults defaultErrorHandler >> ValidationResult.traverse
+let checkMultipleResults drawResults usersDrawList =
+    let combinations =
+        usersDrawList
+        |> List.map (fun (UsersDraw u) -> u |> Set.toArray |> combination 6)
+        |> List.collect id
+        |> List.map (Set.ofList >> UsersDraw)
+
+    MarkSix.checkResults defaultErrorHandler drawResults
+    |> ValidationResult.traverse <| combinations
 
 let printPrizes = function
     | Success l -> List.iteri (addOne >> printfn "Your prize for draw #%i is %A") l

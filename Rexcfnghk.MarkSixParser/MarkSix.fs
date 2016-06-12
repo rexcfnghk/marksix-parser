@@ -5,12 +5,10 @@ open Models
 open ValidationResult
 
 let toUsersDraw usersDrawSet =
-    match Set.toList usersDrawSet with
-    | [m1; m2; m3; m4; m5; m6] ->
-        (m1, m2, m3, m4, m5, m6)
-        |> (UsersDraw >> Success)
-    | _ -> 
-        "Users draw expects a list of six MarkSixNumbers"
+    if Set.count usersDrawSet >= 6
+    then usersDrawSet |> UsersDraw |> Success
+    else 
+        "Users draw expects a list of at least six MarkSixNumbers"
         |> ValidationResult.errorFromString
 
 let toDrawResults (drawnNumberSet, extraNumber) =
@@ -24,11 +22,9 @@ let toDrawResults (drawnNumberSet, extraNumber) =
         "drawResults expects a list of six MarkSixNumbers and one ExtraNumber"
         |> ValidationResult.errorFromString
 
-let randomUsersDraw () =
-    let r = Random()
-
+let randomUsersDraw count (r: Random) =
     let rec randomUsersDrawImpl acc =
-        if Set.count acc = 6
+        if Set.count acc = count
         then acc
         else
             let m = 
@@ -42,53 +38,54 @@ let randomUsersDraw () =
     |> toUsersDraw
     |> ValidationResult.extract
 
-let checkResults errorHandler drawResults usersDraw =
-    let allElementsAreUnique list =
-        let set = Set.ofList list
-        if Set.count set = List.length list
-        then Success list
-        else "There are duplicates in draw result list" |> ValidationResult.errorFromString
+let defaultRandomUsersDraw r = randomUsersDraw 6 r
 
-    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
-        let usersDrawSet, drawResultWithoutExtraNumberSet =
-            Set.ofList usersDraw, Set.ofList drawResultWithoutExtraNumber
-        
+let checkResults errorHandler drawResults usersDraw =
+    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =      
         let points = 
-            (usersDrawSet, drawResultWithoutExtraNumberSet)
+            (usersDraw, drawResultWithoutExtraNumber)
             ||> Set.intersect
             |> Set.count
             |> decimal
 
         let extraPoints = 
-            if Set.contains extraNumber usersDrawSet
+            if Set.contains extraNumber usersDraw
             then 0.5m 
             else 0.m
 
         points + extraPoints |> Points
 
-    let extractedDrawResults =
+    let extractDrawResults drawResults =
         let (DrawResults (
                 DrawnNumber n1, DrawnNumber n2, DrawnNumber n3, 
                 DrawnNumber n4, DrawnNumber n5, DrawnNumber n6, 
                 ExtraNumber e)) = drawResults
-        [n1; n2; n3; n4; n5; n6], e
 
-    let extractedUsersDraw =
-        let (UsersDraw (n1, n2, n3, n4, n5, n6)) = usersDraw
-        [n1; n2; n3; n4; n5; n6]
+        let drawResultsWithoutExtraNumber = [| n1; n2; n3; n4; n5; n6 |]
+        let drawResultsSet = drawResultsWithoutExtraNumber |> Set.ofArray
 
-    let drawResults, extraNumber = extractedDrawResults
+        if Array.length drawResultsWithoutExtraNumber = Set.count drawResultsSet
+        then ValidationResult.success (drawResultsSet, e)
+        else "Input draw results contain dupcliate" |> ValidationResult.errorFromString
 
-    let drawResultsValidated, usersDrawValidated =
-        drawResults |> allElementsAreUnique,
-        extractedUsersDraw |> allElementsAreUnique
+    let extractUsersDraw usersDraw =
+        let (UsersDraw set) = usersDraw
 
-    match usersDrawValidated, drawResultsValidated with
+        if Set.count set >= 6
+        then ValidationResult.success set
+        else 
+            "Users Draw must contain at least six elements" 
+            |> ValidationResult.errorFromString
+
+    let drawResultsV = extractDrawResults drawResults
+    let usersDrawV = extractUsersDraw usersDraw
+
+    match drawResultsV, usersDrawV with
     | Error e, _ | _, Error e -> 
         errorHandler e
         let (ErrorMessage m) = e
         ValidationResult.errorFromString m
-    | Success usersDraw, Success drawResults -> 
+    | Success (drawResults, extraNumber), Success usersDraw -> 
         calculatePoints usersDraw (drawResults, extraNumber)
         |> Prize.fromPoints
         |> ValidationResult.success

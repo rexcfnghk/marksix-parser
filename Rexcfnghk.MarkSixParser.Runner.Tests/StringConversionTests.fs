@@ -1,11 +1,11 @@
-﻿module Rexcfnghk.MarkSixParser.Runner.Tests.CharConversionTests
+﻿module Rexcfnghk.MarkSixParser.Runner.Tests.StringConversionTests
 
 open Xunit
 open FsCheck
 open FsCheck.Xunit
 open Swensen.Unquote
 open Rexcfnghk.MarkSixParser
-open Rexcfnghk.MarkSixParser.Runner.CharConversion
+open Rexcfnghk.MarkSixParser.Runner.StringConversion
 
 [<Property>]
 let ``tryConvertToChar converts successfully for one-character string`` () =
@@ -38,6 +38,28 @@ let ``tryConvertToChar returns error for strings with length > 2 `` () =
 
     Prop.forAll stringLengthLargerThan2Arb <| fun s ->
         test <@ match tryConvertToChar s with Success _ -> false | Error _ -> true @>
+
+[<Property>]
+let ``tryConvertToUsersDrawCount converts successfully for valid strings`` () =
+    let validStringArb =
+        Arb.generate<int>
+        |> Gen.suchThat (fun x -> x >= 6)
+        |> Gen.map (sprintf "%i")
+        |> Arb.fromGen
+
+    Prop.forAll validStringArb <| fun s ->
+        test <@ match tryConvertToUsersDrawCount s with Success _ -> true | Error _ -> false @>
+
+[<Property>]
+let ``tryConvertToUsersDrawCount fails for ints less than six`` () =
+    let invalidStringArb =
+        Arb.generate<int>
+        |> Gen.suchThat (fun x -> x < 6)
+        |> Gen.map (sprintf "%i")
+        |> Arb.fromGen
+
+    Prop.forAll invalidStringArb <| fun s ->
+        test <@ match tryConvertToUsersDrawCount s with Success _ -> false | Error _ -> true @>
 
 [<Fact>]
 let ``tryConvertToChar returns error for code points requiring two UTF-16 code units`` () =
