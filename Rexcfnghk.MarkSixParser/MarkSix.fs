@@ -3,6 +3,7 @@
 open System
 open Models
 open ValidationResult
+open Combinations
 
 let toUsersDraw usersDrawSet =
     if Set.count usersDrawSet >= 6
@@ -89,3 +90,18 @@ let checkResults errorHandler drawResults usersDraw =
         calculatePoints usersDraw (drawResults, extraNumber)
         |> Prize.fromPoints
         |> ValidationResult.success
+
+let checkMultipleUsersDraws 
+    resultsChecker 
+    (errorHandler: ErrorMessage -> unit) 
+    (drawResults: DrawResults) 
+    usersDrawList : ValidationResult<Prize.T list> =
+
+    let flattenedCombinations =
+        usersDrawList
+        |> List.map (function UsersDraw u -> u |> Set.toArray |> combination 6)
+        |> List.collect id
+        |> List.map (Set.ofList >> UsersDraw)
+
+    resultsChecker errorHandler drawResults
+    |> ValidationResult.traverse <| flattenedCombinations

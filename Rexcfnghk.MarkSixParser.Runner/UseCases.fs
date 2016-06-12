@@ -61,15 +61,8 @@ let getMultipleUsersDraw' () =
     printf "\n"
     usersDraw
 
-let checkMultipleResults drawResults usersDrawList =
-    let combinations =
-        usersDrawList
-        |> List.map (fun (UsersDraw u) -> u |> Set.toArray |> combination 6)
-        |> List.collect id
-        |> List.map (Set.ofList >> UsersDraw)
-
-    MarkSix.checkResults defaultErrorHandler drawResults
-    |> ValidationResult.traverse <| combinations
+let checkMultipleUsersDraws' =
+    MarkSix.checkMultipleUsersDraws MarkSix.checkResults defaultErrorHandler
 
 let printPrizes = function
     | Success l -> List.iteri (addOne >> printfn "Your prize for draw #%i is %A") l

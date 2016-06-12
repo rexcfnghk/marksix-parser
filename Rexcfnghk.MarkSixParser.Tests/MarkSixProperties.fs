@@ -133,4 +133,49 @@ let ``checkResults should fail for usersDraw with less than six elements`` () =
             test <@ match MarkSix.checkResults ignore drawResults usersDraw with 
                     | Success _ -> false 
                     | Error _ -> true @>
+
+[<Property>]
+let ``checkMultipleUsersDraws should return success for valid usersDrawList`` () =
+    Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
+        Prop.forAll usersDrawArb <| fun usersDraw ->
+            let drawResults = 
+                (drawResultsSet, extraNumber)
+                |> MarkSix.toDrawResults
+                |> ValidationResult.extract
+
+            test <@ match MarkSix.checkMultipleUsersDraws MarkSix.checkResults ignore drawResults [usersDraw] with
+                     | Success _ -> true
+                     | Error _ -> false @>
+
+[<Property>]
+let ``checkMultipleUsersDraws should return correct number of combinations for valid usersDrawList`` () =
+    let usersDrawArb =
+        Gen.choose (6, 10)
+        >>= markSixNumberSetGen 
+        |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
+        |> Arb.fromGen
+
+    let factorial =
+        let rec factorialImpl acc = function
+            | 0 -> acc
+            | n -> factorialImpl (acc * n) (n - 1)
+        factorialImpl 1
+
+    let expectedNumberOfCombinations arr =
+        let n = Array.length arr
+        factorial n / (factorial 6 * (factorial (n - 6)))
+
+    Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
+        Prop.forAll usersDrawArb <| fun usersDraw ->
+            let drawResults = 
+                (drawResultsSet, extraNumber)
+                |> MarkSix.toDrawResults
+                |> ValidationResult.extract
+
+            let (UsersDraw set) = usersDraw
+            let numberOfCombinations = set |> Set.toArray |> expectedNumberOfCombinations 
+
+            test <@ match MarkSix.checkMultipleUsersDraws MarkSix.checkResults ignore drawResults [usersDraw] with
+                     | Success x -> List.length x = numberOfCombinations
+                     | Error _ -> false @>
         

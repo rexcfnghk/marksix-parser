@@ -8,7 +8,7 @@ let main _ =
 
     let usersDrawList = getMultipleUsersDraw' ()
 
-    let prizesResult = checkMultipleResults drawResults usersDrawList
+    let prizesResult = checkMultipleUsersDraws' drawResults usersDrawList
     printPrizes prizesResult
 
     stdin.ReadLine() |> ignore
