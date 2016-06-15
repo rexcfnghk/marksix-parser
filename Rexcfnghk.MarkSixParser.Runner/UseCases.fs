@@ -38,20 +38,20 @@ let getUsersDrawNumbers' () =
 let getMultipleUsersDraw' () =
     printfn "Enter users draw(s)"
 
-    let printUsersDrawLength list = 
+    let printUsersDrawLength list =
         list |> (List.length >> printfn "You entered %i user's draw(s)")
         list
 
     let printUsersDrawElements = List.iteri (addOne >> printfn "User's draw #%i: %A")
 
-    let decisionPrompt () = 
-        stdin.ReadLine 
+    let decisionPrompt () =
+        stdin.ReadLine
         >> tryConvertToChar
         >=> Decision.toResult
         |> ValidationResult.retryable defaultErrorHandler
 
-    let usersDraw = 
-        getMultipleUsersDraw 
+    let usersDraw =
+        getMultipleUsersDraw
             (fun _ -> getUsersDrawNumbers' ())
             (fun _ -> decisionPrompt ())
 

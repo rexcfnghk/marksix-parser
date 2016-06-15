@@ -5,6 +5,6 @@ let combination k n =
         | 0 -> [[]]
         | i ->
             [ for j = lo to (Array.length n) - 1 do
-                for ks in choose (j + 1) (i - 1) -> 
+                for ks in choose (j + 1) (i - 1) ->
                     n.[j] :: ks ]
     choose 0 k

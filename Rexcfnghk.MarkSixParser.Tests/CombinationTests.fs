@@ -24,7 +24,7 @@ let ``combination should return correct number of combinations for arrays more t
         |> Gen.filter (fun arr -> Array.length arr > 6 && Array.length arr <= 10)
         |> Arb.fromGen
 
-    Prop.forAll arrayArb <| fun arr -> 
+    Prop.forAll arrayArb <| fun arr ->
         let result = combination 6 arr
 
         List.length result =! expectedNumberOfCombinations arr

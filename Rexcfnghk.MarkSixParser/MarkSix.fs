@@ -8,13 +8,13 @@ open Combinations
 let toUsersDraw usersDrawSet =
     if Set.count usersDrawSet >= 6
     then usersDrawSet |> UsersDraw |> Success
-    else 
+    else
         "Users draw expects a list of at least six MarkSixNumbers"
         |> ValidationResult.errorFromString
 
 let toDrawResults (drawnNumberSet, extraNumber) =
     match Set.toList drawnNumberSet, extraNumber with
-    | [d1; d2; d3; d4; d5; d6], e -> 
+    | [d1; d2; d3; d4; d5; d6], e ->
         (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
          DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
          ExtraNumber e)
@@ -28,13 +28,13 @@ let randomUsersDraw count (r: Random) =
         if Set.count acc = count
         then acc
         else
-            let m = 
+            let m =
                 r.Next(1, 50)
                 |> MarkSixNumber.create
                 |> ValidationResult.extract
 
             randomUsersDrawImpl (Set.add m acc)
-    
+
     randomUsersDrawImpl Set.empty
     |> toUsersDraw
     |> ValidationResult.extract
@@ -42,24 +42,24 @@ let randomUsersDraw count (r: Random) =
 let defaultRandomUsersDraw r = randomUsersDraw 6 r
 
 let checkResults errorHandler drawResults usersDraw =
-    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =      
-        let points = 
+    let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
+        let points =
             (usersDraw, drawResultWithoutExtraNumber)
             ||> Set.intersect
             |> Set.count
             |> decimal
 
-        let extraPoints = 
+        let extraPoints =
             if Set.contains extraNumber usersDraw
-            then 0.5m 
+            then 0.5m
             else 0.m
 
         points + extraPoints |> Points
 
     let extractDrawResults drawResults =
         let (DrawResults (
-                DrawnNumber n1, DrawnNumber n2, DrawnNumber n3, 
-                DrawnNumber n4, DrawnNumber n5, DrawnNumber n6, 
+                DrawnNumber n1, DrawnNumber n2, DrawnNumber n3,
+                DrawnNumber n4, DrawnNumber n5, DrawnNumber n6,
                 ExtraNumber e)) = drawResults
 
         let drawResultsWithoutExtraNumber = [| n1; n2; n3; n4; n5; n6 |]
@@ -74,27 +74,27 @@ let checkResults errorHandler drawResults usersDraw =
 
         if Set.count set >= 6
         then ValidationResult.success set
-        else 
-            "Users Draw must contain at least six elements" 
+        else
+            "Users Draw must contain at least six elements"
             |> ValidationResult.errorFromString
 
     let drawResultsV = extractDrawResults drawResults
     let usersDrawV = extractUsersDraw usersDraw
 
     match drawResultsV, usersDrawV with
-    | Error e, _ | _, Error e -> 
+    | Error e, _ | _, Error e ->
         errorHandler e
         let (ErrorMessage m) = e
         ValidationResult.errorFromString m
-    | Success (drawResults, extraNumber), Success usersDraw -> 
+    | Success (drawResults, extraNumber), Success usersDraw ->
         calculatePoints usersDraw (drawResults, extraNumber)
         |> Prize.fromPoints
         |> ValidationResult.success
 
-let checkMultipleUsersDraws 
-    resultsChecker 
-    (errorHandler: ErrorMessage -> unit) 
-    (drawResults: DrawResults) 
+let checkMultipleUsersDraws
+    resultsChecker
+    (errorHandler: ErrorMessage -> unit)
+    (drawResults: DrawResults)
     usersDrawList : ValidationResult<Prize.T list> =
 
     let flattenedCombinations =

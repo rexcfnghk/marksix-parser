@@ -17,14 +17,14 @@ let markSixNumberGen =
 
 [<Property>]
 let ``MarkSixNumber.create returns error for integers out of range`` () =
-    Prop.forAll outOfRangeArb <| fun x -> 
+    Prop.forAll outOfRangeArb <| fun x ->
         test <@ match MarkSixNumber.create x with Error _ -> true | _ -> false @>
 
 [<Property>]
 let ``Wrapping and unwrapping MarkSixNumber gives same underlying int`` () =
     let markSixNumberArb = markSixNumberGen |> Arb.fromGen
-    Prop.forAll markSixNumberArb <| fun m -> 
-        m 
+    Prop.forAll markSixNumberArb <| fun m ->
+        m
         |> MarkSixNumber.value
         |> MarkSixNumber.create
         |> ValidationResult.extract

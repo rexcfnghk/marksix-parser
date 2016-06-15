@@ -18,7 +18,7 @@ let markSixNumberSetGen count =
     |> Gen.filter (fun s -> Set.count s >= count)
     |> Gen.map (Seq.take count >> Set.ofSeq)
 
-let usersDrawArb = 
+let usersDrawArb =
     markSixNumberSetGen 6
     |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
 
@@ -29,7 +29,7 @@ let ``Valid string can be read by readMarkSixNumber`` () =
         |> Gen.map (sprintf "%i")
         |> Arb.fromGen
 
-    Prop.forAll stringArb <| fun s -> 
+    Prop.forAll stringArb <| fun s ->
         let reader () = s
         let result = MarkSixNumberReader.readMarkSixNumber reader ()
         test <@ match result with Success _ -> true | Error _ -> false @>
@@ -45,7 +45,7 @@ let ``Invalid string returns error by readMarkSixNumber`` () =
         |> Gen.filter (fun s -> not (List.contains s validStrings))
         |> Arb.fromGen
 
-    Prop.forAll stringArb <| fun s -> 
+    Prop.forAll stringArb <| fun s ->
         let reader () = s
         let result = MarkSixNumberReader.readMarkSixNumber reader ()
         test <@ match result with Success _ -> false | Error _ -> true @>
@@ -53,9 +53,9 @@ let ``Invalid string returns error by readMarkSixNumber`` () =
 [<Property>]
 let ``getMultipleUsersDraw can accept multiple users draws`` (NonNegativeInt size) =
     size > 0 ==> lazy
-    
+
     let usersDrawArrayArb =
-        usersDrawArb 
+        usersDrawArb
         |> Gen.arrayOfLength size
         |> Arb.fromGen
 
@@ -65,9 +65,9 @@ let ``getMultipleUsersDraw can accept multiple users draws`` (NonNegativeInt siz
         |> List.toArray
 
     Prop.forAll usersDrawArrayArb <| fun array ->
-        let list = 
+        let list =
             MarkSixNumberReader.getMultipleUsersDraw
-                (Array.get array) 
+                (Array.get array)
                 (fun i -> Array.get decisionArray (i - 1))
 
         list =! Array.toList array

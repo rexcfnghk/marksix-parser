@@ -3,7 +3,7 @@
 open UseCases
 
 [<EntryPoint>]
-let main _ = 
+let main _ =
     let drawResults = getDrawResultNumbers' ()
 
     let usersDrawList = getMultipleUsersDraw' ()

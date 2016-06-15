@@ -14,8 +14,8 @@ let ``Points can be converted to prize`` () =
         |> Gen.map Points
         |> Arb.fromGen
 
-    let map = 
-        [| 
+    let map =
+        [|
             (Points 3m, Normal 40m<hkd>)
             (Points 3.5m, Normal 320m<hkd>)
             (Points 4m, Normal 640m<hkd>)

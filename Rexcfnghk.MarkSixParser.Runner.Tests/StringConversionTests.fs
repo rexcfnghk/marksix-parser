@@ -9,23 +9,23 @@ open Rexcfnghk.MarkSixParser.Runner.StringConversion
 
 [<Property>]
 let ``tryConvertToChar converts successfully for one-character string`` () =
-    let validStringArb = 
+    let validStringArb =
         Arb.generate<char>
         |> Gen.map string
         |> Arb.fromGen
 
-    Prop.forAll validStringArb <| fun s -> 
+    Prop.forAll validStringArb <| fun s ->
         let cV = tryConvertToChar s
         test <@ match cV with Success _ -> true | Error _ -> false @>
 
 [<Property>]
 let ``tryConvertToChar returns the same char from the one-character string`` () =
-    let validStringArb = 
+    let validStringArb =
         Arb.generate<char>
         |> Gen.map string
         |> Arb.fromGen
 
-    Prop.forAll validStringArb <| fun s -> 
+    Prop.forAll validStringArb <| fun s ->
         let cV = tryConvertToChar s
         test <@ match cV with Success c -> sprintf "%c" c = s | Error _ -> false @>
 

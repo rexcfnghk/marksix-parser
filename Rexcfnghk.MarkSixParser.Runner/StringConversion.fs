@@ -11,11 +11,11 @@ let private tryConvert converter errorMessage s =
 
 let tryConvertToChar = tryConvert Char.TryParse "Input is not a valid character"
 
-let tryConvertToUsersDrawCount = 
+let tryConvertToUsersDrawCount =
     let greaterThanOrEqualsToSix x =
-         if x >= 6 
+         if x >= 6
          then ValidationResult.success x
-         else 
+         else
             ValidationResult.errorFromString "User's draw count must be greater than six"
 
     tryConvert Int32.TryParse "Input is not a valid integer"

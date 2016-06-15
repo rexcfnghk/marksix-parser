@@ -4,7 +4,7 @@ open System
 
 [<CustomComparison; CustomEquality>]
 [<StructuredFormatDisplay("{AsString}")>]
-type T = 
+type T =
     | MarkSixNumber of int
 
     interface IComparable<T> with
@@ -32,11 +32,11 @@ type T =
 
     member private this.AsString = this.ToString()
 
-let create input = 
+let create input =
     if input >= 1 && input <= 49 then
         input
         |> (MarkSixNumber >> ValidationResult.success)
-    else 
+    else
         "Input out of range"
         |> ValidationResult.errorFromString
 

@@ -20,7 +20,7 @@ let markSixNumberSetGen count =
     |> Gen.filter (fun s -> Set.count s >= count)
     |> Gen.map (Seq.take count >> Set.ofSeq)
 
-let usersDrawArb = 
+let usersDrawArb =
     markSixNumberSetGen 6
     |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
     |> Arb.fromGen
@@ -83,19 +83,19 @@ let ``toDrawResults fails when given list length not equals to seven`` () =
 [<Property(MaxTest = 500)>]
 let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw`` () =
     let calculatePoints usersDraw (drawResultWithoutExtraNumber, extraNumber) =
-        let points = 
+        let points =
             (Set.ofList usersDraw, drawResultWithoutExtraNumber)
             ||> Set.intersect
             |> Set.count
             |> decimal
 
-        let extraPoints = 
+        let extraPoints =
             match List.tryFind ((=) extraNumber) usersDraw with
             | Some _ -> 0.5m
             | None -> 0.m
 
         points + extraPoints |> Points
-    
+
     Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
         Prop.forAll usersDrawArb <| fun usersDraw ->
             let extractedDrawResults =
@@ -107,10 +107,10 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
                 let (UsersDraw s) = usersDraw
                 Set.toList s
 
-            let expected = 
+            let expected =
                 calculatePoints extractedUsersDraw (drawResultsSet, extraNumber)
                 |> Prize.fromPoints
- 
+
             let actual =
                 MarkSix.checkResults ignore extractedDrawResults usersDraw
                 |> ValidationResult.extract
@@ -121,24 +121,24 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
 let ``checkResults should fail for usersDraw with less than six elements`` () =
     Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
         Prop.forAll invalidLengthUsersDrawArb <| fun usersDrawSet ->
-            let drawResults = 
+            let drawResults =
                 (drawResultsSet, extraNumber)
                 |> MarkSix.toDrawResults
                 |> ValidationResult.extract
 
-            let usersDraw = 
+            let usersDraw =
                 usersDrawSet
                 |> UsersDraw
 
-            test <@ match MarkSix.checkResults ignore drawResults usersDraw with 
-                    | Success _ -> false 
+            test <@ match MarkSix.checkResults ignore drawResults usersDraw with
+                    | Success _ -> false
                     | Error _ -> true @>
 
 [<Property>]
 let ``checkMultipleUsersDraws should return success for valid usersDrawList`` () =
     Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
         Prop.forAll usersDrawArb <| fun usersDraw ->
-            let drawResults = 
+            let drawResults =
                 (drawResultsSet, extraNumber)
                 |> MarkSix.toDrawResults
                 |> ValidationResult.extract
@@ -151,7 +151,7 @@ let ``checkMultipleUsersDraws should return success for valid usersDrawList`` ()
 let ``checkMultipleUsersDraws should return correct number of combinations for valid usersDrawList`` () =
     let usersDrawArb =
         Gen.choose (6, 10)
-        >>= markSixNumberSetGen 
+        >>= markSixNumberSetGen
         |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
         |> Arb.fromGen
 
@@ -167,15 +167,14 @@ let ``checkMultipleUsersDraws should return correct number of combinations for v
 
     Prop.forAll drawResultsArb <| fun (drawResultsSet, extraNumber) ->
         Prop.forAll usersDrawArb <| fun usersDraw ->
-            let drawResults = 
+            let drawResults =
                 (drawResultsSet, extraNumber)
                 |> MarkSix.toDrawResults
                 |> ValidationResult.extract
 
             let (UsersDraw set) = usersDraw
-            let numberOfCombinations = set |> Set.toArray |> expectedNumberOfCombinations 
+            let numberOfCombinations = set |> Set.toArray |> expectedNumberOfCombinations
 
             test <@ match MarkSix.checkMultipleUsersDraws MarkSix.checkResults ignore drawResults [usersDraw] with
                      | Success x -> List.length x = numberOfCombinations
                      | Error _ -> false @>
-        

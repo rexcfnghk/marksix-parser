@@ -6,7 +6,7 @@ open Rexcfnghk.MarkSixParser.ValidationResult
 open Rexcfnghk.MarkSixParser.Runner.Decision
 open ErrorHandling
 
-let readMarkSixNumber reader = 
+let readMarkSixNumber reader =
     let validateInt32 string =
         match Int32.TryParse string with
         | true, i -> ValidationResult.success i
@@ -25,21 +25,21 @@ let rec private getDrawNumbers maxCount acc markSixNumberReader  =
 
     if index = maxCount
     then acc
-    else 
-        let readAndTryAddToSet () = 
+    else
+        let readAndTryAddToSet () =
             index |> markSixNumberReader >>= tryAddToSet acc
-        let updatedSet = 
+        let updatedSet =
             ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
-        getDrawNumbers maxCount updatedSet markSixNumberReader 
+        getDrawNumbers maxCount updatedSet markSixNumberReader
 
-let getDrawResultNumbers markSixNumberReader = 
+let getDrawResultNumbers markSixNumberReader =
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
         then DuplicateErrorMessage |> ValidationResult.errorFromString
         else element |> ValidationResult.success
 
     let drawnNumbers = getDrawNumbers 6 Set.empty markSixNumberReader
-    let extraNumber = 
+    let extraNumber =
         let index = 6
         (fun () -> markSixNumberReader index)
         >=> tryReturnExtraNumber drawnNumbers
@@ -53,12 +53,12 @@ let getUsersDrawNumbers n =
     getDrawNumbers n Set.empty
     >> MarkSix.toUsersDraw
     >> ValidationResult.extract
-            
+
 let getMultipleUsersDraw getSingleUsersDraw decisionPrompt =
     let generator (index, decision) =
         if decision = Yes
         then
-            let newIndex = index + 1 
+            let newIndex = index + 1
             Some (getSingleUsersDraw index, (newIndex, decisionPrompt newIndex))
         else
             None

@@ -6,7 +6,7 @@ type ExtraNumber = ExtraNumber of MarkSixNumber.T
 
 type Points = Points of decimal
 
-type DrawResults = DrawResults of DrawnNumber * DrawnNumber * DrawnNumber * 
+type DrawResults = DrawResults of DrawnNumber * DrawnNumber * DrawnNumber *
                                   DrawnNumber * DrawnNumber * DrawnNumber * ExtraNumber
 
 type UsersDraw = UsersDraw of Set<MarkSixNumber.T>
