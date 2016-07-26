@@ -4,6 +4,7 @@ source https://api.nuget.org/v3/index.json
 nuget coveralls.io
 nuget FAKE
 nuget FsCheck.Xunit
+nuget FSharpLint.Fake
 nuget OpenCover
 nuget ReportGenerator
 nuget Unquote
