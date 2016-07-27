@@ -92,6 +92,7 @@ Target "Pack" (fun _ ->
 ) 
 
 "Clean"
+    ==> "Lint"
     ==> "BuildRunner"
     ==> "BuildTests"
     ==> "RunTests"
