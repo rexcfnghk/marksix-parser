@@ -1,10 +1,13 @@
 #r @"packages/FAKE/tools/FakeLib.dll"
+#r @"packages/FSharpLint.Fake/tools/FSharpLint.Fake.dll"
+
 open System
 open System.Diagnostics
 open System.IO
 open Fake
 open Fake.Testing.XUnit2
 open Fake.OpenCoverHelper
+open FSharpLint.Fake
 
 let buildDir = "./build/"
 let testDir = "./tests/"
@@ -15,6 +18,11 @@ let openCoverResultsXmlPath = testDir @@ "results.xml"
 let packageDir = Directory.GetCurrentDirectory() @@ "packages/"
     
 Target "Clean" (fun _ -> CleanDirs [ buildDir; testDir; deployDir ])
+
+Target "Lint" (fun _ ->
+    !! "**/*.fsproj"
+        |> Seq.iter (FSharpLint id)
+)
 
 Target "BuildRunner" (fun _ ->
     !! "Rexcfnghk.MarkSixParser.*/*.fsproj"
