@@ -9,10 +9,11 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Rexcfnghk.MarkSixParser.Runner.Tests</RootNamespace>
     <AssemblyName>Rexcfnghk.MarkSixParser.Runner.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>Rexcfnghk.MarkSixParser.Runner.Tests</Name>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
