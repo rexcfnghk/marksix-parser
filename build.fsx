@@ -35,31 +35,21 @@ Target "BuildTests" (fun _ ->
     !! "Rexcfnghk.MarkSixParser*.Tests/*.fsproj"
         |> MSBuildDebug testDir "Build"
         |> Log "Tests built")
-        
-Target "RunTests" (fun _ ->
-    testDlls
-        |> xUnit2 (fun p -> 
-            { p with 
-                ShadowCopy = not isCIBuild })
-)
 
 Target "OpenCover" (fun _ ->
-    let configStartProcessInfoF (info: ProcessStartInfo) =
-        let xunitExePath = packageDir @@ "xunit.runner.console/tools/xunit.console.exe"
-        let filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser*.Tests]*"
-        let targetArgs = 
-            ["Rexcfnghk.MarkSixParser.Tests.dll"; "Rexcfnghk.MarkSixParser.Runner.Tests.dll"]
-            |> List.map ((@@) testDir)
-            |> String.concat " "
-        info.FileName <- packageDir @@ "OpenCover/tools/OpenCover.Console.exe"
-        info.Arguments <- 
-            sprintf """-target:"%s" -targetargs:"%s -noshadow" -output:"%s" -filter:"%s" %s"""
-                xunitExePath targetArgs openCoverResultsXmlPath filter (if hasBuildParam "travis" then String.Empty else "-register:user")
-                
-    let result = ExecProcess configStartProcessInfoF (TimeSpan.FromMinutes 5.)
-    
-    if result <> 0 then
-        failwith "Cannot run OpenCover"
+    let targetArgs = 
+        ["Rexcfnghk.MarkSixParser.Tests.dll"; "Rexcfnghk.MarkSixParser.Runner.Tests.dll"]
+        |> List.map ((@@) testDir)
+        |> String.concat " "
+        |> (+) (if not isCIBuild then String.Empty else " -noshadow")
+    OpenCover (fun p -> 
+        { p with
+            ExePath = packageDir @@ "OpenCover/tools/OpenCover.Console.exe"
+            TestRunnerExePath = packageDir @@ "xunit.runner.console/tools/xunit.console.exe"
+            Filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser*.Tests]*"
+            Output = openCoverResultsXmlPath
+            OptionalArguments = if hasBuildParam "travis" then String.Empty else "-register:user" })
+        targetArgs
 )
         
 Target "SendToCoveralls" (fun _ -> 
@@ -95,7 +85,6 @@ Target "Pack" (fun _ ->
     ==> "Lint"
     ==> "BuildRunner"
     ==> "BuildTests"
-    ==> "RunTests"
     ==> "OpenCover"
     =?> ("SendToCoveralls", isCIBuild)
     ==> "Pack"
