@@ -41,7 +41,6 @@ Target "OpenCover" (fun _ ->
         ["Rexcfnghk.MarkSixParser.Tests.dll"; "Rexcfnghk.MarkSixParser.Runner.Tests.dll"]
         |> List.map ((@@) testDir)
         |> String.concat " "
-        |> (+) (if not isCIBuild then String.Empty else " -noshadow")
     OpenCover (fun p -> 
         { p with
             ExePath = packageDir @@ "OpenCover/tools/OpenCover.Console.exe"
@@ -49,7 +48,7 @@ Target "OpenCover" (fun _ ->
             Filter = "+[Rexcfnghk.MarkSixParser*]Rexcfnghk.* -[Rexcfnghk.MarkSixParser*.Tests]*"
             Output = openCoverResultsXmlPath
             OptionalArguments = if hasBuildParam "travis" then String.Empty else "-register:user" })
-        targetArgs
+        (targetArgs + if not isCIBuild then String.Empty else " -noshadow")
 )
         
 Target "SendToCoveralls" (fun _ -> 
