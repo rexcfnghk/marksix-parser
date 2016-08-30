@@ -59,7 +59,6 @@
     <Compile Include="MarkSixNumber.fsi" />
     <Compile Include="MarkSixNumber.fs" />
     <Compile Include="Models.fs" />
-    <Compile Include="Points.fs" />
     <Compile Include="Prize.fs" />
     <Compile Include="MarkSix.fs" />
   </ItemGroup>
