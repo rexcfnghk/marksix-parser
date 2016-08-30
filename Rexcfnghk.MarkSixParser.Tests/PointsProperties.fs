@@ -2,7 +2,6 @@
 
 open Rexcfnghk.MarkSixParser
 open Models
-open Points
 open FsCheck
 open FsCheck.Xunit
 open Swensen.Unquote
@@ -11,7 +10,7 @@ open Swensen.Unquote
 let ``Points addition has identity`` d1 =
     let p1 = Points d1
     let p2 = Points 0.m
-    p1 .+. p2 =! p1
+    p1 + p2 =! p1
 
 [<Property>]
 let ``Points addition is communicative`` () =
@@ -21,7 +20,7 @@ let ``Points addition is communicative`` () =
         |> Arb.fromGen
     Prop.forAll pointsArb <| fun p1 ->
         Prop.forAll pointsArb <| fun p2 ->
-            p1 .+. p2 =! p2 .+. p1
+            p1 + p2 =! p2 + p1
 
 [<Property>]
 let ``Points addition is associative`` () =
@@ -32,4 +31,4 @@ let ``Points addition is associative`` () =
     Prop.forAll pointsArb <| fun p1 ->
         Prop.forAll pointsArb <| fun p2 ->
             Prop.forAll pointsArb <| fun p3 ->
-                (p1 .+. p2) .+. p3 =! p1 .+. (p2 .+. p3)
+                (p1 + p2) + p3 =! p1 + (p2 + p3)
