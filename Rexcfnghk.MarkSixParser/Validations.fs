@@ -38,7 +38,7 @@ module ValidationResult =
 
     let (>>=) x f = bind f x
 
-    let extract<'a> : ValidationResult<'a> -> 'a = doubleMap id (fun (ErrorMessage e) -> invalidOp e)
+    let extract<'a> : ValidationResult<'a> -> 'a = doubleMap id (function ErrorMessage e -> invalidOp e)
 
     let (>=>) f g = f >> bind g
 
