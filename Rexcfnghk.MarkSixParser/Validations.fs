@@ -13,6 +13,9 @@ type ValidationResult<'a> =
     member private this.AsString = this.ToString()
 
 module ValidationResult =
+
+    open Rexcfnghk.MarkSixParser.Utilities
+
     let success = Success
 
     let error = Error
@@ -34,7 +37,8 @@ module ValidationResult =
 
     let (<!>) = map
 
-    let bind f = doubleMap f Error
+    let bind<'a, 'b> : ('a -> ValidationResult<'b>) -> ValidationResult<'a> -> ValidationResult<'b> =
+        flip doubleMap Error
 
     let (>>=) x f = bind f x
 
