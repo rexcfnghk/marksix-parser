@@ -65,6 +65,7 @@
     <Content Include="paket.references" />
     <Content Include="App.config" />
     <Compile Include="CombinationTests.fs" />
+    <Compile Include="UtilitiesTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
