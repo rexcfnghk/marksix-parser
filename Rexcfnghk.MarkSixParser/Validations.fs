@@ -27,20 +27,20 @@ module ValidationResult =
         | Error e -> errorHandler e
 
     let rec retryable errorHandler f =
-        let result = f ()
-        let retry e =
+        match f () with
+        | Success x -> x
+        | Error e ->
             errorHandler e
             retryable errorHandler f
-        doubleMap id retry result
-
-    let map f = doubleMap (f >> Success) Error
-
-    let (<!>) = map
 
     let bind<'a, 'b> : ('a -> ValidationResult<'b>) -> ValidationResult<'a> -> ValidationResult<'b> =
         flip doubleMap Error
 
     let (>>=) x f = bind f x
+
+    let map f = bind (f >> Success)
+
+    let (<!>) = map
 
     let extract<'a> : ValidationResult<'a> -> 'a = doubleMap id (function ErrorMessage e -> invalidOp e)
 
