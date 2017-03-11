@@ -25,7 +25,7 @@ let ``checkResults returns error when drawResult contains duplicate`` () =
                 l |> Set.ofList |> UsersDraw
             | _ -> failwith "Not expected to be here"
 
-    let Result = MarkSix.checkResults ignore drawResults usersDraw
+    let result = MarkSix.checkResults ignore drawResults usersDraw
 
     test <@ match Result with Error _ -> true | _ -> false @>
 
