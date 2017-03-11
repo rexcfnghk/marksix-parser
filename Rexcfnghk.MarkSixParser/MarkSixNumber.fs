@@ -35,9 +35,9 @@ type T =
 let create input =
     if input >= 1 && input <= 49 then
         input
-        |> (MarkSixNumber >> ValidationResult.success)
+        |> (MarkSixNumber >> Result.ok)
     else
         "Input out of range"
-        |> ValidationResult.errorFromString
+        |> Result.errorFromString
 
 let value (MarkSixNumber num) = num

@@ -4,7 +4,7 @@ open Rexcfnghk.MarkSixParser
 open StringConversion
 open ErrorHandling
 open MarkSixNumberReader
-open ValidationResult
+open Result
 open Combinations
 open Models
 
@@ -16,7 +16,7 @@ let markSixNumberReader _ =
 let getUsersDrawCount () =
     stdin.ReadLine
     >> tryConvertToUsersDrawCount
-    |> ValidationResult.retryable defaultErrorHandler
+    |> retryable defaultErrorHandler
 
 let getDrawResultNumbers' () =
     printfn "Enter draw results"
@@ -48,7 +48,7 @@ let getMultipleUsersDraw' () =
         stdin.ReadLine
         >> tryConvertToChar
         >=> Decision.toResult
-        |> ValidationResult.retryable defaultErrorHandler
+        |> retryable defaultErrorHandler
 
     let usersDraw =
         getMultipleUsersDraw
@@ -65,5 +65,5 @@ let checkMultipleUsersDraws' =
     MarkSix.checkMultipleUsersDraws MarkSix.checkResults defaultErrorHandler
 
 let printPrizes = function
-    | Success l -> List.iteri (addOne >> printfn "Your prize for draw #%i is %A") l
+    | Ok l -> List.iteri (addOne >> printfn "Your prize for draw #%i is %A") l
     | Error e -> printfn "%A" e

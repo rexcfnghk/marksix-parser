@@ -70,7 +70,7 @@ let ``getMultipleUsersDraw can accept multiple UsersDraw list`` () =
             [| 3; 4; 24; 28; 30; 32 |]
             [| 1; 2; 3; 4; 5; 6 |]
         |]
-        |> Array.map (Array.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> Array.map (Array.map (MarkSixNumber.create >> Result.extract)
                         >> Set.ofArray
                         >> MarkSix.toUsersDraw)
 
@@ -81,5 +81,5 @@ let ``getMultipleUsersDraw can accept multiple UsersDraw list`` () =
     test <@ Array.forall2 (fun usersDraw m6Number ->
         match usersDraw, m6Number with
         | Error (ErrorMessage e), _ | _, Error (ErrorMessage e) -> failwith e
-        | Success usersDraw, Success m6Number ->
+        | Ok usersDraw, Ok m6Number ->
             usersDraw = m6Number) multipleUsersDrawResult usersDrawList @>

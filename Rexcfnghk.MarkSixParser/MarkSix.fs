@@ -2,15 +2,14 @@
 
 open System
 open Models
-open ValidationResult
 open Combinations
 
 let toUsersDraw usersDrawSet =
     if Set.count usersDrawSet >= 6
-    then usersDrawSet |> UsersDraw |> Success
+    then usersDrawSet |> UsersDraw |> Ok
     else
         "Users draw expects a list of at least six MarkSixNumbers"
-        |> ValidationResult.errorFromString
+        |> Result.errorFromString
 
 let toDrawResults (drawnNumberSet, extraNumber) =
     match Set.toList drawnNumberSet, extraNumber with
@@ -18,10 +17,10 @@ let toDrawResults (drawnNumberSet, extraNumber) =
         (DrawnNumber d1, DrawnNumber d2, DrawnNumber d3,
          DrawnNumber d4, DrawnNumber d5, DrawnNumber d6,
          ExtraNumber e)
-        |> (DrawResults >> Success)
+        |> (DrawResults >> Ok)
     | _ ->
         "drawResults expects a list of six MarkSixNumbers and one ExtraNumber"
-        |> ValidationResult.errorFromString
+        |> Result.errorFromString
 
 let randomUsersDraw count (r: Random) =
     let rec randomUsersDrawImpl acc =
@@ -31,13 +30,13 @@ let randomUsersDraw count (r: Random) =
             let m =
                 r.Next(1, 50)
                 |> MarkSixNumber.create
-                |> ValidationResult.extract
+                |> Result.extract
 
             randomUsersDrawImpl (Set.add m acc)
 
     randomUsersDrawImpl Set.empty
     |> toUsersDraw
-    |> ValidationResult.extract
+    |> Result.extract
 
 let defaultRandomUsersDraw r = randomUsersDraw 6 r
 
@@ -66,17 +65,17 @@ let checkResults errorHandler drawResults usersDraw =
         let drawResultsSet = drawResultsWithoutExtraNumber |> Set.ofArray
 
         if Array.length drawResultsWithoutExtraNumber = Set.count drawResultsSet
-        then ValidationResult.success (drawResultsSet, e)
-        else "Input draw results contain dupcliate" |> ValidationResult.errorFromString
+        then Result.ok (drawResultsSet, e)
+        else "Input draw results contain dupcliate" |> Result.errorFromString
 
     let extractUsersDraw usersDraw =
         let (UsersDraw set) = usersDraw
 
         if Set.count set >= 6
-        then ValidationResult.success set
+        then Result.ok set
         else
             "Users Draw must contain at least six elements"
-            |> ValidationResult.errorFromString
+            |> Result.errorFromString
 
     let drawResultsV = extractDrawResults drawResults
     let usersDrawV = extractUsersDraw usersDraw
@@ -85,17 +84,17 @@ let checkResults errorHandler drawResults usersDraw =
     | Error e, _ | _, Error e ->
         errorHandler e
         let (ErrorMessage m) = e
-        ValidationResult.errorFromString m
-    | Success (drawResults, extraNumber), Success usersDraw ->
+        Result.errorFromString m
+    | Ok (drawResults, extraNumber), Ok usersDraw ->
         calculatePoints usersDraw (drawResults, extraNumber)
         |> Prize.fromPoints
-        |> ValidationResult.success
+        |> Result.ok
 
 let checkMultipleUsersDraws
     resultsChecker
     (errorHandler: ErrorMessage -> unit)
     (drawResults: DrawResults)
-    usersDrawList : ValidationResult<Prize.T list> =
+    usersDrawList : Result<Prize.T list, ErrorMessage> =
 
     let flattenedCombinations =
         usersDrawList
@@ -104,4 +103,4 @@ let checkMultipleUsersDraws
         |> List.map (Set.ofList >> UsersDraw)
 
     resultsChecker errorHandler drawResults
-    |> ValidationResult.traverse <| flattenedCombinations
+    |> Result.traverse <| flattenedCombinations

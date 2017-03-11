@@ -4,4 +4,4 @@ open Rexcfnghk.MarkSixParser
 
 type T = Yes | No
 
-val toResult : char -> ValidationResult<T>
+val toResult : char -> Result<T, ErrorMessage>

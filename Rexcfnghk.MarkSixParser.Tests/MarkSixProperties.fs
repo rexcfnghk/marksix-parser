@@ -9,7 +9,7 @@ open System
 
 let markSixNumberGen =
     Gen.elements [1..49]
-    |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
+    |> Gen.map (MarkSixNumber.create >> Result.extract)
 
 let markSixNumberArb = Arb.fromGen markSixNumberGen
 
@@ -22,7 +22,7 @@ let markSixNumberSetGen count =
 
 let usersDrawArb =
     markSixNumberSetGen 6
-    |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
+    |> Gen.map (MarkSix.toUsersDraw >> Result.extract)
     |> Arb.fromGen
 
 let drawResultsArb =
@@ -101,7 +101,7 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
             let extractedDrawResults =
                 (drawResultsSet, extraNumber)
                 |> MarkSix.toDrawResults
-                |> ValidationResult.extract
+                |> Result.extract
 
             let extractedUsersDraw =
                 let (UsersDraw s) = usersDraw
@@ -113,7 +113,7 @@ let ``checkResults returns correct Prize for arbitrary drawResults and usersDraw
 
             let actual =
                 MarkSix.checkResults ignore extractedDrawResults usersDraw
-                |> ValidationResult.extract
+                |> Result.extract
 
             actual =! expected
 
@@ -124,14 +124,14 @@ let ``checkResults should fail for usersDraw with less than six elements`` () =
             let drawResults =
                 (drawResultsSet, extraNumber)
                 |> MarkSix.toDrawResults
-                |> ValidationResult.extract
+                |> Result.extract
 
             let usersDraw =
                 usersDrawSet
                 |> UsersDraw
 
             test <@ match MarkSix.checkResults ignore drawResults usersDraw with
-                    | Success _ -> false
+                    | Ok _ -> false
                     | Error _ -> true @>
 
 [<Property>]
@@ -141,10 +141,10 @@ let ``checkMultipleUsersDraws should return success for valid usersDrawList`` ()
             let drawResults =
                 (drawResultsSet, extraNumber)
                 |> MarkSix.toDrawResults
-                |> ValidationResult.extract
+                |> Result.extract
 
             test <@ match MarkSix.checkMultipleUsersDraws MarkSix.checkResults ignore drawResults [usersDraw] with
-                     | Success _ -> true
+                     | Ok _ -> true
                      | Error _ -> false @>
 
 [<Property>]
@@ -152,7 +152,7 @@ let ``checkMultipleUsersDraws should return correct number of combinations for v
     let usersDrawArb =
         Gen.choose (6, 10)
         >>= markSixNumberSetGen
-        |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
+        |> Gen.map (MarkSix.toUsersDraw >> Result.extract)
         |> Arb.fromGen
 
     let factorial =
@@ -170,11 +170,11 @@ let ``checkMultipleUsersDraws should return correct number of combinations for v
             let drawResults =
                 (drawResultsSet, extraNumber)
                 |> MarkSix.toDrawResults
-                |> ValidationResult.extract
+                |> Result.extract
 
             let (UsersDraw set) = usersDraw
             let numberOfCombinations = set |> Set.toArray |> expectedNumberOfCombinations
 
             test <@ match MarkSix.checkMultipleUsersDraws MarkSix.checkResults ignore drawResults [usersDraw] with
-                     | Success x -> List.length x = numberOfCombinations
+                     | Ok x -> List.length x = numberOfCombinations
                      | Error _ -> false @>

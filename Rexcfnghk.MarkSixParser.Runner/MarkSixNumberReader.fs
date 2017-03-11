@@ -2,15 +2,15 @@
 
 open System
 open Rexcfnghk.MarkSixParser
-open Rexcfnghk.MarkSixParser.ValidationResult
+open Rexcfnghk.MarkSixParser.Result
 open Rexcfnghk.MarkSixParser.Runner.Decision
 open ErrorHandling
 
 let readMarkSixNumber reader =
     let validateInt32 string =
         match Int32.TryParse string with
-        | true, i -> ValidationResult.success i
-        | false, _ -> "Input is not an integer" |> ValidationResult.errorFromString
+        | true, i -> ok i
+        | false, _ -> "Input is not an integer" |> errorFromString
 
     reader >> validateInt32 >=> MarkSixNumber.create
 
@@ -18,8 +18,8 @@ let rec private getDrawNumbers maxCount acc markSixNumberReader  =
     let tryAddToSet acc element =
         let updatedSet = Set.add element acc
         if Set.count updatedSet = Set.count acc
-        then DuplicateErrorMessage |> ValidationResult.errorFromString
-        else updatedSet |> ValidationResult.success
+        then DuplicateErrorMessage |> errorFromString
+        else updatedSet |> ok
 
     let index = Set.count acc
 
@@ -29,30 +29,30 @@ let rec private getDrawNumbers maxCount acc markSixNumberReader  =
         let readAndTryAddToSet () =
             index |> markSixNumberReader >>= tryAddToSet acc
         let updatedSet =
-            ValidationResult.retryable defaultErrorHandler readAndTryAddToSet
+            retryable defaultErrorHandler readAndTryAddToSet
         getDrawNumbers maxCount updatedSet markSixNumberReader
 
 let getDrawResultNumbers markSixNumberReader =
     let tryReturnExtraNumber set element =
         if Set.exists ((=) element) set
-        then DuplicateErrorMessage |> ValidationResult.errorFromString
-        else element |> ValidationResult.success
+        then DuplicateErrorMessage |> errorFromString
+        else element |> ok
 
     let drawnNumbers = getDrawNumbers 6 Set.empty markSixNumberReader
     let extraNumber =
         let index = 6
         (fun () -> markSixNumberReader index)
         >=> tryReturnExtraNumber drawnNumbers
-        |> ValidationResult.retryable defaultErrorHandler
+        |> retryable defaultErrorHandler
 
     (drawnNumbers, extraNumber)
     |> MarkSix.toDrawResults
-    |> ValidationResult.extract
+    |> extract
 
 let getUsersDrawNumbers n =
     getDrawNumbers n Set.empty
     >> MarkSix.toUsersDraw
-    >> ValidationResult.extract
+    >> extract
 
 let getMultipleUsersDraw getSingleUsersDraw decisionPrompt =
     let generator (index, decision) =

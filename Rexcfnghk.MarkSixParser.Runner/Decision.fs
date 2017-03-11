@@ -13,6 +13,6 @@ let (|EqualsIgnoreCase|_|) pattern char =
     else None
 
 let toResult = function
-    | EqualsIgnoreCase 'y' -> Success Yes
-    | EqualsIgnoreCase 'n' -> Success No
-    | _ -> "Unrecognised decision" |> ValidationResult.errorFromString
+    | EqualsIgnoreCase 'y' -> Ok Yes
+    | EqualsIgnoreCase 'n' -> Ok No
+    | _ -> "Unrecognised decision" |> Result.errorFromString

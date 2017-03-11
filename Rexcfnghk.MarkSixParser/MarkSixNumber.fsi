@@ -8,6 +8,6 @@ type T =
     interface IComparable<T>
     interface IEquatable<T>
 
-val create : int -> ValidationResult<T>
+val create : int -> Result<T, ErrorMessage>
 
 val value : T -> int

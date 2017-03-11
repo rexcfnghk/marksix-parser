@@ -13,7 +13,7 @@ let outOfRangeArb =
 
 let markSixNumberGen =
     Gen.elements [1..49]
-    |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
+    |> Gen.map (MarkSixNumber.create >> Result.extract)
 
 [<Property>]
 let ``MarkSixNumber.create returns error for integers out of range`` () =
@@ -27,7 +27,7 @@ let ``Wrapping and unwrapping MarkSixNumber gives same underlying int`` () =
         m
         |> MarkSixNumber.value
         |> MarkSixNumber.create
-        |> ValidationResult.extract
+        |> Result.extract
         =! m
 
 [<Property>]
@@ -37,7 +37,7 @@ let ``x less than y infers MarkSixNumber<x> is less than MarkSixNumber<y>`` () =
         |> Gen.two
         |> Gen.filter (fun (x, y) -> x < y)
         |> Arb.fromGen
-    let extract = MarkSixNumber.create >> ValidationResult.extract
+    let extract = MarkSixNumber.create >> Result.extract
     Prop.forAll xyGenerator <| fun (x, y) ->
         let m1, m2 = extract x, extract y
         m1 <! m2
@@ -46,7 +46,7 @@ let ``x less than y infers MarkSixNumber<x> is less than MarkSixNumber<y>`` () =
 let ``Equal MarkSixNumbers have equal hash codes`` () =
     let m6Arb =
         Gen.constant 42
-        |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
+        |> Gen.map (MarkSixNumber.create >> Result.extract)
         |> Gen.two
         |> Arb.fromGen
 

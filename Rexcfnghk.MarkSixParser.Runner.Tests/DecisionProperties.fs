@@ -19,10 +19,10 @@ let invalidCharPatternArb =
 let ``valid char patterns returns some decision`` () =
     Prop.forAll validCharPatternArb <| fun c ->
         let result = toResult c
-        test <@ match result with Success _ -> true | Error _ -> false @>
+        test <@ match result with Ok _ -> true | Error _ -> false @>
 
 [<Property>]
 let ``invalid char patterns returns none`` () =
     Prop.forAll invalidCharPatternArb <| fun c ->
         let result = toResult c
-        test <@ match result with Success _ -> false | Error _ -> true @>
+        test <@ match result with Ok _ -> false | Error _ -> true @>

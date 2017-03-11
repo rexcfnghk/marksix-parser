@@ -9,7 +9,7 @@ open Rexcfnghk.MarkSixParser.Runner.Decision
 
 let m6Gen =
     Gen.elements [1..49]
-    |> Gen.map (MarkSixNumber.create >> ValidationResult.extract)
+    |> Gen.map (MarkSixNumber.create >> Result.extract)
 
 let markSixNumberSetGen count =
     m6Gen
@@ -20,7 +20,7 @@ let markSixNumberSetGen count =
 
 let usersDrawArb =
     markSixNumberSetGen 6
-    |> Gen.map (MarkSix.toUsersDraw >> ValidationResult.extract)
+    |> Gen.map (MarkSix.toUsersDraw >> Result.extract)
 
 [<Property>]
 let ``Valid string can be read by readMarkSixNumber`` () =
@@ -32,7 +32,7 @@ let ``Valid string can be read by readMarkSixNumber`` () =
     Prop.forAll stringArb <| fun s ->
         let reader () = s
         let result = MarkSixNumberReader.readMarkSixNumber reader ()
-        test <@ match result with Success _ -> true | Error _ -> false @>
+        test <@ match result with Ok _ -> true | Error _ -> false @>
 
 [<Property>]
 let ``Invalid string returns error by readMarkSixNumber`` () =
@@ -48,7 +48,7 @@ let ``Invalid string returns error by readMarkSixNumber`` () =
     Prop.forAll stringArb <| fun s ->
         let reader () = s
         let result = MarkSixNumberReader.readMarkSixNumber reader ()
-        test <@ match result with Success _ -> false | Error _ -> true @>
+        test <@ match result with Ok _ -> false | Error _ -> true @>
 
 [<Property>]
 let ``getMultipleUsersDraw can accept multiple users draws`` (NonNegativeInt size) =
