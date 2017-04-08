@@ -89,7 +89,7 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.2'">
       <ItemGroup>
         <Reference Include="FsCheck">
-          <HintPath>..\packages\FsCheck\lib\net45\FsCheck.dll</HintPath>
+          <HintPath>..\packages\FsCheck\lib\net452\FsCheck.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -100,7 +100,7 @@
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.2'">
       <ItemGroup>
         <Reference Include="FsCheck.Xunit">
-          <HintPath>..\packages\FsCheck.Xunit\lib\net45\FsCheck.Xunit.dll</HintPath>
+          <HintPath>..\packages\FsCheck.Xunit\lib\net452\FsCheck.Xunit.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
