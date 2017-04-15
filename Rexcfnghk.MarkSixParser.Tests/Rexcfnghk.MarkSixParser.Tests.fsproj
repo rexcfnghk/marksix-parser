@@ -53,6 +53,12 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Content Include="any\netstandard1.6\FSharp.Core.optdata">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="any\netstandard1.6\FSharp.Core.sigdata">
+      <Paket>True</Paket>
+    </Content>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="MarkSixProperties.fs" />
     <Compile Include="MarkSixNumberProperties.fs" />

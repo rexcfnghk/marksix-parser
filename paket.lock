@@ -8,7 +8,7 @@ NUGET
     FsCheck.Xunit (2.8)
       FsCheck (>= 2.8)
       xunit.extensibility.execution (>= 2.2 < 3.0)
-    FSharp.Core (4.1.2)
+    FSharp.Core (4.1.12)
       System.ValueTuple (>= 4.3)
     FSharpLint.Fake (0.4.11)
     OpenCover (4.6.519)
