@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Rexcfnghk.MarkSixParser</RootNamespace>
     <AssemblyName>Rexcfnghk.MarkSixParser</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>Rexcfnghk.MarkSixParser</Name>
